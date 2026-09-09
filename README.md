@@ -75,6 +75,36 @@ click.
 These are the dependency notifications that onboarding usually chases by email. They fall out of the same pass
 that drafts the compliance rules, because the classifier has already decided who owns each clause.
 
+## Mandate composition — how much of this is actually bespoke
+
+```bash
+node score/mix.mjs readiness/examples/meridian-extracted.json
+node score/mix.mjs readiness/examples/calder-extracted.json
+```
+
+No API key. Splits extracted restrictions three ways against the precedent corpus:
+
+- **Configuration** — the parameter shape is exactly what a prior account already coded. Only the values are
+  this client's
+- **Parameterised** — an archetype match, but the shape differs. This client needs a parameter no precedent
+  carries, or drops one every precedent has
+- **Novel** — nothing to work from: no archetype match, or an archetype the book has never coded
+
+The split is on shape, not on values. A 5% cap where precedent says 4% is not extra work — it is the same
+rule with a different number, which is the entire premise of the tool. What costs time is a rule whose fields
+do not line up with anything coded before. An earlier version of this scored on value equality and put every
+clause in one bucket, which is a good sign a category is defined wrong.
+
+The report also weights by effort, on the argument that a novel rule costs several times what filling in a
+known shape costs. Those weights are assumed, not measured, and the output says so. Replace them with real
+cycle times per rule and it becomes a planning input rather than an illustration.
+
+**Read the numbers with the caveat attached.** Both example mandates score 0% novel, because the precedent
+corpus in this repo was written to cover them. That is a property of the demo, not a finding. The measure is
+only worth quoting against a real book, where the corpus is thousands of coded rules across hundreds of
+accounts and nobody chose it to flatter the result. What the tool provides is the method — a defensible,
+reproducible way to answer "how bespoke is this really" instead of trading intuitions about it.
+
 ## Account readiness — what the document does not say
 
 ```bash
