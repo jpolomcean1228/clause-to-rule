@@ -59,9 +59,50 @@ So the extraction prompt is instructed to over-propose and flag doubt rather tha
 evaluation of this pipeline should weight recall accordingly. Optimising for a balanced F1 here would be the
 wrong objective function for the business.
 
-## How you would evaluate it
+## Evaluation
 
-Not shipped in this prototype — it needs real coded rules — but this is the approach:
+`eval/` holds a hand-labeled fixture set and a runner.
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+node eval/run.mjs                        # full set
+node eval/run.mjs --limit 8              # quick pass
+node eval/run.mjs --runs 3               # variance across repeated runs
+node eval/run.mjs --model claude-opus-5  # compare models
+```
+
+A preflight call runs before anything is scored. If it fails, the harness stops and prints the API error
+rather than reporting zeros — an eval that cannot distinguish "the model was wrong" from "the model never
+ran" is worse than no eval. Failed calls mid-run are counted and reported separately from behavioural
+results.
+
+The runner parses `ARCHETYPES` and the system prompt out of `index.html` rather than keeping its own copy, so
+it always scores the prompt the console actually ships. A duplicated prompt drifts within a week, and an eval
+that scores a prompt you are not running is worse than no eval.
+
+It reports recall and precision separately and deliberately does not blend them:
+
+- **Restriction recall** — restrictions the pipeline classified as restrictions. The number to optimise
+- **Key value recall** — thresholds that survived extraction intact
+- **Ambiguity recall** — known-unanswerable clauses the model flagged rather than answered confidently
+- **False restriction rate** and **over-flag rate** — the cheap errors, tracked but not minimised
+- **Per-archetype breakdown** — where the pattern library is thin
+- **Calibration** — whether stated confidence tracks actual accuracy. If it does not, the routing thresholds in
+  `tierOf()` are decorative and the fast-approve queue is a liability
+
+Results are written to `eval/RESULTS.md`.
+
+The fixtures include deliberate hard cases: double negatives, permissions nested inside prohibitions,
+thresholds defined only by reference to an appendix, revenue screens with no named data vendor, and
+open-ended carve-backs. On those the correct behaviour is to flag, not to answer.
+
+Fixtures written by the same author as the prompt will flatter the pipeline. The honest version of this eval
+runs against mandates already coded in a production compliance engine, where the labels are what an analyst
+actually did.
+
+## Pointing it at real data
+
+The harness above covers the mechanics. With real access, this is how it should be pointed at production data:
 
 1. **Golden set from history.** Take mandates already coded in the compliance engine. Run their source
    documents through the pipeline. Compare proposals against what the analyst actually coded. This is the only

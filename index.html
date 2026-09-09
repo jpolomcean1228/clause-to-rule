@@ -363,7 +363,10 @@
 </div>
 
 <script>
-const MODEL = "claude-sonnet-4-6";
+// Inside a Claude artifact the call is proxied and keyless, and takes the in-artifact model id.
+// From a clone or GitHub Pages the caller supplies their own key, which needs a public API model id.
+const MODEL_ARTIFACT = "claude-sonnet-4-6";
+const MODEL_API = "claude-sonnet-5";
 const MAX_CLAUSES = 12;
 
 const SAMPLES = [
@@ -455,6 +458,7 @@ const state = { proposals: [], log: [], running: false };
 async function callModel(system, prompt, maxTokens) {
   const headers = { "Content-Type": "application/json" };
   const key = document.getElementById("key").value.trim();
+  const model = key ? MODEL_API : MODEL_ARTIFACT;
   if (key) {
     headers["x-api-key"] = key;
     headers["anthropic-version"] = "2023-06-01";
@@ -464,7 +468,7 @@ async function callModel(system, prompt, maxTokens) {
     method: "POST",
     headers,
     body: JSON.stringify({
-      model: MODEL,
+      model,
       max_tokens: maxTokens || 1000,
       system,
       messages: [{ role: "user", content: prompt }]
@@ -472,7 +476,11 @@ async function callModel(system, prompt, maxTokens) {
   });
   if (!res.ok) {
     if (res.status === 401 || res.status === 403) document.getElementById("keyrow").hidden = false;
-    throw new Error("The model call failed (" + res.status + "). If you are running this from a clone, add an API key below and try again.");
+    let detail = "";
+    try { detail = (JSON.parse(await res.text()).error || {}).message || ""; } catch (e) {}
+    throw new Error("The model call failed (" + res.status + "). " + detail +
+      (key ? " Check the key is a console.anthropic.com API key with credit on the account."
+           : " If you are running this from a clone, add an API key below and try again."));
   }
   const data = await res.json();
   return (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");

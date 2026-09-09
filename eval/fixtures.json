@@ -1,0 +1,269 @@
+{
+  "version": "0.1.0",
+  "note": "Hand-labeled clauses. Synthetic, written to mirror the shape of real mandate language. 'key_values' are the facts a reviewer must not lose; they are matched against any returned parameter value rather than a named field, since the model may reasonably name a parameter differently than we do. 'should_flag' marks clauses where the correct behaviour is to raise an ambiguity rather than answer confidently.",
+  "clauses": [
+    {
+      "id": "F01",
+      "text": "No more than five percent (5%) of the market value of the Account shall be invested in the securities of any single issuer, provided that this limitation shall not apply to obligations issued or guaranteed by the United States government or its agencies.",
+      "classification": "RESTRICTION",
+      "archetype_id": "ISSUER_CONCENTRATION",
+      "key_values": ["5"],
+      "should_flag": false
+    },
+    {
+      "id": "F02",
+      "text": "The Manager shall not permit the Account's holdings in any one issuer to exceed three percent (3%) of the Account's market value.",
+      "classification": "RESTRICTION",
+      "archetype_id": "ISSUER_CONCENTRATION",
+      "key_values": ["3"],
+      "should_flag": false
+    },
+    {
+      "id": "F03",
+      "text": "Aggregate exposure to any single GICS sector shall not exceed twenty-five percent (25%) of the market value of the Account.",
+      "classification": "RESTRICTION",
+      "archetype_id": "SECTOR_LIMIT",
+      "key_values": ["25"],
+      "should_flag": false
+    },
+    {
+      "id": "F04",
+      "text": "Exposure to any single GICS sector shall not exceed the weight of that sector in the Benchmark by more than seven hundred fifty (750) basis points.",
+      "classification": "RESTRICTION",
+      "archetype_id": "SECTOR_LIMIT",
+      "key_values": ["750"],
+      "should_flag": false
+    },
+    {
+      "id": "F05",
+      "text": "Not more than fifteen percent (15%) of the market value of the Account may be invested in issuers domiciled in countries classified as emerging markets by the Benchmark provider.",
+      "classification": "RESTRICTION",
+      "archetype_id": "GEOGRAPHIC_LIMIT",
+      "key_values": ["15"],
+      "should_flag": false
+    },
+    {
+      "id": "F06",
+      "text": "Investments in issuers domiciled in any single country other than the United States shall not exceed ten percent (10%) of the Account.",
+      "classification": "RESTRICTION",
+      "archetype_id": "GEOGRAPHIC_LIMIT",
+      "key_values": ["10"],
+      "should_flag": false
+    },
+    {
+      "id": "F07",
+      "text": "Securities purchased for the Account shall carry a minimum rating of BBB- by Standard & Poor's at the time of purchase.",
+      "classification": "RESTRICTION",
+      "archetype_id": "CREDIT_RATING_FLOOR",
+      "key_values": ["BBB-"],
+      "should_flag": false
+    },
+    {
+      "id": "F08",
+      "text": "The weighted average credit quality of the Account shall be maintained at not less than A3 by Moody's, measured on an ongoing basis. Where two agencies assign split ratings, the lower shall govern.",
+      "classification": "RESTRICTION",
+      "archetype_id": "CREDIT_RATING_FLOOR",
+      "key_values": ["A3"],
+      "should_flag": false
+    },
+    {
+      "id": "F09",
+      "text": "The effective duration of the Account shall be maintained within plus or minus one (1) year of the effective duration of the Benchmark.",
+      "classification": "RESTRICTION",
+      "archetype_id": "DURATION_BAND",
+      "key_values": ["1"],
+      "should_flag": false
+    },
+    {
+      "id": "F10",
+      "text": "Portfolio effective duration shall at all times be not less than three (3) years and not more than seven (7) years.",
+      "classification": "RESTRICTION",
+      "archetype_id": "DURATION_BAND",
+      "key_values": ["3", "7"],
+      "should_flag": false
+    },
+    {
+      "id": "F11",
+      "text": "No security shall be purchased with a final maturity greater than ten (10) years from the date of settlement.",
+      "classification": "RESTRICTION",
+      "archetype_id": "MATURITY_LIMIT",
+      "key_values": ["10"],
+      "should_flag": false
+    },
+    {
+      "id": "F12",
+      "text": "The Manager shall not invest the Account in private placements, commodities, or direct real estate.",
+      "classification": "RESTRICTION",
+      "archetype_id": "PROHIBITED_INSTRUMENT",
+      "key_values": ["commodities"],
+      "should_flag": false
+    },
+    {
+      "id": "F13",
+      "text": "The Manager is not prohibited from using interest rate futures and interest rate swaps solely for the purpose of managing portfolio duration, and shall not employ such instruments to create economic leverage.",
+      "classification": "RESTRICTION",
+      "archetype_id": "DERIVATIVES_USAGE",
+      "key_values": ["duration"],
+      "should_flag": false,
+      "hard_case": "Double negative. The clause permits an instrument class by negating a prohibition, then imposes a separate leverage constraint. A naive read inverts it."
+    },
+    {
+      "id": "F14",
+      "text": "The Account shall maintain not less than two percent (2%) of market value in cash and cash equivalents at all times.",
+      "classification": "RESTRICTION",
+      "archetype_id": "LIQUIDITY_MINIMUM",
+      "key_values": ["2"],
+      "should_flag": false
+    },
+    {
+      "id": "F15",
+      "text": "The Account shall hold not less than one percent (1%) and not more than five percent (5%) of market value in cash and cash equivalents, tested at month end.",
+      "classification": "RESTRICTION",
+      "archetype_id": "LIQUIDITY_MINIMUM",
+      "key_values": ["1", "5"],
+      "should_flag": false
+    },
+    {
+      "id": "F16",
+      "text": "The Manager shall not purchase any security appearing on the Client's restricted securities list, as delivered to the Manager and updated from time to time in accordance with Appendix IV.",
+      "classification": "RESTRICTION",
+      "archetype_id": "RESTRICTED_LIST",
+      "key_values": [],
+      "should_flag": true,
+      "hard_case": "The rule is codeable but the list itself is an external feed defined in an appendix the model cannot see. Correct behaviour is to propose the rule and flag the unresolved dependency."
+    },
+    {
+      "id": "F17",
+      "text": "The Account shall exclude issuers deriving more than five percent (5%) of revenue from thermal coal extraction, as determined by MSCI ESG Research.",
+      "classification": "RESTRICTION",
+      "archetype_id": "ESG_SCREEN",
+      "key_values": ["5", "coal"],
+      "should_flag": false
+    },
+    {
+      "id": "F18",
+      "text": "The Account shall exclude issuers deriving more than ten percent (10%) of revenue from tobacco production. Screening shall be applied at the issuer level.",
+      "classification": "RESTRICTION",
+      "archetype_id": "ESG_SCREEN",
+      "key_values": ["10", "tobacco"],
+      "should_flag": true,
+      "hard_case": "No data vendor named. Revenue-threshold screens are unimplementable without one, and different vendors classify differently, so the parameter is genuinely missing rather than merely unstated."
+    },
+    {
+      "id": "F19",
+      "text": "Derivatives may be used solely for hedging and efficient portfolio management. Aggregate notional exposure shall not exceed twenty percent (20%) of the market value of the Account.",
+      "classification": "RESTRICTION",
+      "archetype_id": "DERIVATIVES_USAGE",
+      "key_values": ["20", "hedging"],
+      "should_flag": false
+    },
+    {
+      "id": "F20",
+      "text": "Net exposure to any single counterparty shall not exceed ten percent (10%) of the Account, and no counterparty shall carry a rating below A- at the time of trade.",
+      "classification": "RESTRICTION",
+      "archetype_id": "COUNTERPARTY_LIMIT",
+      "key_values": ["10", "A-"],
+      "should_flag": false
+    },
+    {
+      "id": "F21",
+      "text": "The Manager shall manage the Account with a view to maintaining tracking error against the Benchmark of no more than four hundred (400) basis points.",
+      "classification": "RESTRICTION",
+      "archetype_id": "TRACKING_ERROR_LIMIT",
+      "key_values": ["400"],
+      "should_flag": true,
+      "hard_case": "Ex ante and ex post tracking error are different measurements producing different breach profiles. The clause does not say which, and 'with a view to' further muddies whether this is a hard limit or a target."
+    },
+    {
+      "id": "F22",
+      "text": "Ex ante tracking error against the Benchmark, measured monthly, shall not exceed three hundred (300) basis points.",
+      "classification": "RESTRICTION",
+      "archetype_id": "TRACKING_ERROR_LIMIT",
+      "key_values": ["300"],
+      "should_flag": false
+    },
+    {
+      "id": "F23",
+      "text": "Non-base currency exposure shall be hedged to one hundred percent (100%) of market value, with a permitted tolerance band of plus or minus two percent (2%). The base currency of the Account is US dollars.",
+      "classification": "RESTRICTION",
+      "archetype_id": "CURRENCY_HEDGE",
+      "key_values": ["100", "2"],
+      "should_flag": false
+    },
+    {
+      "id": "F24",
+      "text": "Nothing herein shall be construed to preclude the Manager from holding securities received as a result of a corporate action, provided such securities are disposed of within thirty (30) days.",
+      "classification": "RESTRICTION",
+      "archetype_id": null,
+      "key_values": ["30"],
+      "should_flag": true,
+      "hard_case": "A carve-out to unnamed other restrictions rather than a standalone rule. Correct behaviour is to surface it for review rather than force it into an archetype."
+    },
+    {
+      "id": "F25",
+      "text": "Concentration in any single issuer shall not exceed the limit set forth in Schedule 3 hereto.",
+      "classification": "RESTRICTION",
+      "archetype_id": "ISSUER_CONCENTRATION",
+      "key_values": [],
+      "should_flag": true,
+      "hard_case": "Archetype is unambiguous, threshold is defined only by external reference. The rule cannot be coded without Schedule 3."
+    },
+    {
+      "id": "F26",
+      "text": "The Manager shall not hedge currency exposure except as otherwise agreed in writing between the parties.",
+      "classification": "RESTRICTION",
+      "archetype_id": "CURRENCY_HEDGE",
+      "key_values": [],
+      "should_flag": true,
+      "hard_case": "A prohibition with an open-ended carve-back. Whether any side letter has since modified this is unknowable from the document alone."
+    },
+    {
+      "id": "F27",
+      "text": "The Manager shall be paid a fee, billed quarterly in arrears, of 22 basis points per annum on the first $100 million of average daily market value and 18 basis points per annum on amounts above that level.",
+      "classification": "FEE",
+      "archetype_id": null,
+      "key_values": [],
+      "should_flag": false
+    },
+    {
+      "id": "F28",
+      "text": "Forty (40) basis points per annum on average daily market value, billed quarterly in arrears, subject to an annual minimum fee of $150,000.",
+      "classification": "FEE",
+      "archetype_id": null,
+      "key_values": [],
+      "should_flag": false
+    },
+    {
+      "id": "F29",
+      "text": "The Manager shall deliver a monthly performance and holdings report within ten (10) business days of month end, and a quarterly attribution report within twenty (20) business days of quarter end.",
+      "classification": "REPORTING",
+      "archetype_id": null,
+      "key_values": [],
+      "should_flag": false
+    },
+    {
+      "id": "F30",
+      "text": "Assets of the Account shall be held by Northern Trust Company as custodian. The Manager shall transmit trade instructions to the custodian by 11:00 a.m. Eastern on trade date plus one.",
+      "classification": "OPERATIONAL",
+      "archetype_id": null,
+      "key_values": [],
+      "should_flag": false
+    },
+    {
+      "id": "F31",
+      "text": "The Account shall be included in the Manager's Core Fixed Income composite for purposes of GIPS-compliant performance presentation, effective from the first full month following funding.",
+      "classification": "PERFORMANCE",
+      "archetype_id": null,
+      "key_values": [],
+      "should_flag": false
+    },
+    {
+      "id": "F32",
+      "text": "This Agreement shall be governed by and construed in accordance with the laws of the State of Illinois, without regard to its conflict of laws principles.",
+      "classification": "BOILERPLATE",
+      "archetype_id": null,
+      "key_values": [],
+      "should_flag": false
+    }
+  ]
+}
