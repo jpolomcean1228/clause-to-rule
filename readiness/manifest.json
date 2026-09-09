@@ -1,0 +1,276 @@
+{
+  "version": "0.1.0",
+  "note": "What an account needs before it can be opened, funded and traded. Onboarding stalls on absence far more than on difficulty, so this is the list a mandate is checked against. Items marked external can never be satisfied by reading the document — they are operational artifacts that must be chased separately, and naming them as such is the point.",
+  "blocking_levels": {
+    "funding": "Account cannot be funded until this is resolved",
+    "trading": "Account can be funded but must not trade until this is resolved",
+    "billing": "Does not block trading. Blocks the first invoice",
+    "reporting": "Does not block trading. Blocks the first client report",
+    "none": "Tracked for completeness"
+  },
+  "items": [
+    {
+      "id": "LEGAL_GOVERNING_LAW",
+      "category": "Legal and entity",
+      "label": "Governing law and jurisdiction stated",
+      "owner": "Legal",
+      "blocks": "funding",
+      "required_when": { "always": true },
+      "satisfied_by": { "classification_present": ["BOILERPLATE"] },
+      "note": "Drives which regulatory regime the account sits under."
+    },
+    {
+      "id": "LEGAL_SIGNED_IMA",
+      "category": "Legal and entity",
+      "label": "Executed IMA on file",
+      "owner": "Legal",
+      "blocks": "funding",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true },
+      "note": "A guidelines exhibit is not evidence the agreement was executed."
+    },
+    {
+      "id": "LEGAL_ENTITY_IDENTIFIERS",
+      "category": "Legal and entity",
+      "label": "Legal entity name and LEI captured",
+      "owner": "Client onboarding",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true },
+      "note": "Required for reporting and counterparty setup. Rarely in the guidelines document."
+    },
+    {
+      "id": "LEGAL_TRADING_AUTHORITY",
+      "category": "Legal and entity",
+      "label": "Authorised signers and trading authority confirmed",
+      "owner": "Legal",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true }
+    },
+
+    {
+      "id": "MANDATE_BENCHMARK",
+      "category": "Mandate definition",
+      "label": "Benchmark named",
+      "owner": "Performance",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "parameter_named": ["benchmark", "relative_to"], "text_match": ["benchmark"] },
+      "note": "Benchmark-relative restrictions cannot be coded or monitored without it."
+    },
+    {
+      "id": "MANDATE_BASE_CURRENCY",
+      "category": "Mandate definition",
+      "label": "Base currency stated",
+      "owner": "Middle office",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "parameter_named": ["base_currency"], "text_match": ["base currency"] }
+    },
+    {
+      "id": "MANDATE_VEHICLE",
+      "category": "Mandate definition",
+      "label": "Vehicle and structure confirmed",
+      "owner": "Client onboarding",
+      "blocks": "funding",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true },
+      "note": "Separate account, commingled fund or sub-advised. Drives most downstream setup."
+    },
+    {
+      "id": "MANDATE_FUNDING",
+      "category": "Mandate definition",
+      "label": "Funding date and initial funding method agreed",
+      "owner": "Middle office",
+      "blocks": "funding",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true },
+      "note": "Cash or in-kind. In-kind funding pulls in transition management and a legacy asset review."
+    },
+
+    {
+      "id": "COMP_GUIDELINES_RECEIVED",
+      "category": "Compliance",
+      "label": "Investment guidelines received",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "classification_present": ["RESTRICTION"] }
+    },
+    {
+      "id": "COMP_ALL_RULES_CODED",
+      "category": "Compliance",
+      "label": "Every restriction coded with no unresolved ambiguity",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "no_open_ambiguities": true },
+      "note": "The single most common reason an account is funded but cannot trade."
+    },
+    {
+      "id": "COMP_RESTRICTED_LIST_FILE",
+      "category": "Compliance",
+      "label": "Restricted list file delivered and feed established",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "archetype_present": ["RESTRICTED_LIST"] },
+      "satisfied_by": { "external": true },
+      "note": "The rule is codeable from the document. The list never is — it is a recurring data feed with its own delivery mechanism and update cadence."
+    },
+    {
+      "id": "COMP_ESG_VENDOR",
+      "category": "Compliance",
+      "label": "ESG data vendor named for revenue-threshold screens",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "archetype_present": ["ESG_SCREEN"] },
+      "satisfied_by": { "parameter_on_archetype": { "archetype": "ESG_SCREEN", "name": "data_vendor" } },
+      "note": "Vendors classify differently. A screen without a named vendor is not implementable, it only looks like it is."
+    },
+    {
+      "id": "COMP_TE_BASIS",
+      "category": "Compliance",
+      "label": "Tracking error measurement basis specified",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "archetype_present": ["TRACKING_ERROR_LIMIT"] },
+      "satisfied_by": { "parameter_on_archetype": { "archetype": "TRACKING_ERROR_LIMIT", "name": "measurement_basis" } },
+      "note": "Ex ante and ex post produce different breach profiles from the same portfolio."
+    },
+    {
+      "id": "COMP_RATING_TEST_POINT",
+      "category": "Compliance",
+      "label": "Rating floor test point and downgrade treatment specified",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "archetype_present": ["CREDIT_RATING_FLOOR"] },
+      "satisfied_by": { "parameter_on_archetype": { "archetype": "CREDIT_RATING_FLOOR", "name": "test_point" } },
+      "note": "At purchase versus ongoing is the difference between a clean book and a permanent breach queue."
+    },
+    {
+      "id": "COMP_ENGINE_CONFIGURED",
+      "category": "Compliance",
+      "label": "Rules loaded into the compliance engine and tested against a model portfolio",
+      "owner": "Compliance",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true }
+    },
+
+    {
+      "id": "OPS_CUSTODIAN",
+      "category": "Operations",
+      "label": "Custodian named",
+      "owner": "Middle office",
+      "blocks": "funding",
+      "required_when": { "always": true },
+      "satisfied_by": { "classification_present": ["OPERATIONAL"], "text_match": ["custodian", "custody"] }
+    },
+    {
+      "id": "OPS_SSI",
+      "category": "Operations",
+      "label": "Standing settlement instructions established",
+      "owner": "Middle office",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true },
+      "note": "A named custodian is not the same as working SSIs. New custodians take the longest."
+    },
+    {
+      "id": "OPS_TRADE_INSTRUCTION",
+      "category": "Operations",
+      "label": "Trade instruction method and cutoff agreed",
+      "owner": "Middle office",
+      "blocks": "trading",
+      "required_when": { "always": true },
+      "satisfied_by": { "text_match": ["trade instruction", "trade date", "cutoff", "cut-off"] }
+    },
+    {
+      "id": "OPS_COUNTERPARTY_SETUP",
+      "category": "Operations",
+      "label": "Counterparty and broker accounts opened",
+      "owner": "Middle office",
+      "blocks": "trading",
+      "required_when": { "archetype_present": ["COUNTERPARTY_LIMIT", "DERIVATIVES_USAGE"] },
+      "satisfied_by": { "external": true },
+      "note": "Derivatives usage implies ISDA and CSA negotiation, which runs on a legal timeline, not an ops one."
+    },
+    {
+      "id": "OPS_CASH_INSTRUCTION",
+      "category": "Operations",
+      "label": "Cash sweep and income handling instruction on file",
+      "owner": "Middle office",
+      "blocks": "none",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true }
+    },
+
+    {
+      "id": "FEE_SCHEDULE",
+      "category": "Billing",
+      "label": "Fee schedule captured",
+      "owner": "Billing",
+      "blocks": "billing",
+      "required_when": { "always": true },
+      "satisfied_by": { "classification_present": ["FEE"] }
+    },
+    {
+      "id": "FEE_BILLING_TERMS",
+      "category": "Billing",
+      "label": "Billing frequency and arrears or advance basis stated",
+      "owner": "Billing",
+      "blocks": "billing",
+      "required_when": { "classification_present": ["FEE"] },
+      "satisfied_by": { "text_match": ["arrears", "in advance", "quarterly", "monthly", "annually"] }
+    },
+    {
+      "id": "FEE_INVOICE_DELIVERY",
+      "category": "Billing",
+      "label": "Billing contact and invoice delivery method confirmed",
+      "owner": "Billing",
+      "blocks": "billing",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true }
+    },
+
+    {
+      "id": "PERF_COMPOSITE",
+      "category": "Performance and reporting",
+      "label": "Composite assignment agreed",
+      "owner": "Performance",
+      "blocks": "reporting",
+      "required_when": { "always": true },
+      "satisfied_by": { "classification_present": ["PERFORMANCE"], "text_match": ["composite", "GIPS"] },
+      "note": "GIPS requires assignment prospectively. Retrofitting an account into a composite after the fact is a problem."
+    },
+    {
+      "id": "PERF_INCEPTION",
+      "category": "Performance and reporting",
+      "label": "Performance inception date agreed",
+      "owner": "Performance",
+      "blocks": "reporting",
+      "required_when": { "always": true },
+      "satisfied_by": { "external": true }
+    },
+    {
+      "id": "REP_PACKAGE",
+      "category": "Performance and reporting",
+      "label": "Report package and contents defined",
+      "owner": "Client reporting",
+      "blocks": "reporting",
+      "required_when": { "always": true },
+      "satisfied_by": { "classification_present": ["REPORTING"] }
+    },
+    {
+      "id": "REP_RECIPIENTS",
+      "category": "Performance and reporting",
+      "label": "Report recipients and delivery channel confirmed",
+      "owner": "Client reporting",
+      "blocks": "reporting",
+      "required_when": { "classification_present": ["REPORTING"] },
+      "satisfied_by": { "external": true },
+      "note": "The document says what to send and when. It almost never says to whom or how."
+    }
+  ]
+}

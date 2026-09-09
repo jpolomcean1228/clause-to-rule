@@ -1,0 +1,45 @@
+{
+  "account": "Meridian Public Employees' Retirement System",
+  "note": "Extraction output for samples/meridian-core-fixed-income.txt, in the shape the console produces. Hand-written here so the readiness check runs without an API key.",
+  "clauses": [
+    { "clause": { "id": "B.1", "text": "No more than five percent (5%) of the market value of the Account shall be invested in the securities of any single issuer, provided that this limitation shall not apply to obligations issued or guaranteed by the United States government or its agencies, or to cash and cash equivalents." },
+      "classification": "RESTRICTION", "archetype_id": "ISSUER_CONCENTRATION",
+      "parameters": [{ "name": "limit_pct", "value": "5" }, { "name": "basis", "value": "market value" }, { "name": "scope", "value": "per issuer" }],
+      "exceptions": ["US government and agency obligations", "cash and equivalents"], "confidence": 0.94, "ambiguities": [] },
+
+    { "clause": { "id": "B.2", "text": "Securities purchased for the Account shall carry a minimum rating of Baa3 by Moody's or BBB- by Standard & Poor's at the time of purchase..." },
+      "classification": "RESTRICTION", "archetype_id": "CREDIT_RATING_FLOOR",
+      "parameters": [{ "name": "minimum_rating", "value": "Baa3 / BBB-" }, { "name": "agency", "value": "Moody's, S&P" }, { "name": "multi_agency_rule", "value": "lower governs" }, { "name": "test_point", "value": "at purchase" }, { "name": "cure_period", "value": "90 days" }],
+      "exceptions": [], "confidence": 0.91, "ambiguities": [] },
+
+    { "clause": { "id": "B.3", "text": "The effective duration of the Account shall be maintained within plus or minus one (1) year of the effective duration of the Benchmark." },
+      "classification": "RESTRICTION", "archetype_id": "DURATION_BAND",
+      "parameters": [{ "name": "relative_to", "value": "benchmark" }, { "name": "min", "value": "-1" }, { "name": "max", "value": "+1" }, { "name": "measure", "value": "effective duration" }],
+      "exceptions": [], "confidence": 0.95, "ambiguities": [] },
+
+    { "clause": { "id": "B.4", "text": "The Manager shall not invest the Account in private placements, commodities, or direct real estate. The Manager is not prohibited from using interest rate futures and interest rate swaps solely for the purpose of managing portfolio duration, and shall not employ such instruments to create economic leverage." },
+      "classification": "RESTRICTION", "archetype_id": "DERIVATIVES_USAGE",
+      "parameters": [{ "name": "permitted_purposes", "value": "duration management only" }, { "name": "leverage_permitted", "value": "no" }],
+      "exceptions": [], "confidence": 0.78, "ambiguities": ["Clause combines an instrument prohibition with a separate derivatives permission; may warrant two rules"] },
+
+    { "clause": { "id": "B.5", "text": "The Manager shall not purchase any security appearing on the Client's restricted securities list, as delivered to the Manager and updated from time to time in accordance with Appendix IV." },
+      "classification": "RESTRICTION", "archetype_id": "RESTRICTED_LIST",
+      "parameters": [{ "name": "list_source", "value": "client-delivered" }],
+      "exceptions": [], "confidence": 0.62, "ambiguities": ["Appendix IV not provided; delivery mechanism and update cadence unknown", "Match basis (issuer, CUSIP, parent) unspecified"] },
+
+    { "clause": { "id": "B.6", "text": "The Manager shall be paid a fee, billed quarterly in arrears, of 22 basis points per annum on the first $100 million of average daily market value and 18 basis points per annum on amounts above that level." },
+      "classification": "FEE", "archetype_id": null, "parameters": [], "exceptions": [], "confidence": 0.96, "ambiguities": [],
+      "summary": "Tiered fee, 22bps to $100m then 18bps, quarterly in arrears. Billing to configure the breakpoint schedule." },
+
+    { "clause": { "id": "B.7", "text": "The Manager shall deliver a monthly performance and holdings report within ten (10) business days of month end, and a quarterly attribution report including duration and sector positioning against the Benchmark within twenty (20) business days of quarter end." },
+      "classification": "REPORTING", "archetype_id": null, "parameters": [], "exceptions": [], "confidence": 0.95, "ambiguities": [],
+      "summary": "Monthly holdings and performance at T+10 business days; quarterly attribution at T+20. Client reporting to build the package." },
+
+    { "clause": { "id": "B.8", "text": "Assets of the Account shall be held by Northern Trust Company as custodian. The Manager shall transmit trade instructions to the custodian by 11:00 a.m. Eastern on trade date plus one." },
+      "classification": "OPERATIONAL", "archetype_id": null, "parameters": [], "exceptions": [], "confidence": 0.93, "ambiguities": [],
+      "summary": "Custodian is Northern Trust; trade instructions due 11:00 ET T+1. Middle office to establish connectivity." },
+
+    { "clause": { "id": "B.9", "text": "This Agreement shall be governed by and construed in accordance with the laws of the State of Illinois, without regard to its conflict of laws principles." },
+      "classification": "BOILERPLATE", "archetype_id": null, "parameters": [], "exceptions": [], "confidence": 0.97, "ambiguities": [] }
+  ]
+}

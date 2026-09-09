@@ -75,6 +75,39 @@ click.
 These are the dependency notifications that onboarding usually chases by email. They fall out of the same pass
 that drafts the compliance rules, because the classifier has already decided who owns each clause.
 
+## Account readiness — what the document does not say
+
+```bash
+node readiness/check.mjs readiness/examples/meridian-extracted.json
+node readiness/check.mjs readiness/examples/calder-extracted.json
+```
+
+No API key, no network, no model calls. The model's job was judgement about what each clause says. This is
+bookkeeping about what a mandate needs, and bookkeeping should not be probabilistic.
+
+`readiness/manifest.json` lists what an account requires before it can be funded, traded, billed and reported.
+The checker compares that list against extracted output and reports what is missing, grouped by blocking level
+and by owning team.
+
+Requirements are conditional. A restricted-list feed is only required if a restricted-list rule was extracted;
+an ESG data vendor only if a revenue-threshold screen exists; a tracking error measurement basis only if there
+is a tracking error limit. Run the two examples and the Calder mandate raises requirements the Meridian one
+never triggers.
+
+The distinction that makes this useful is between two kinds of open item:
+
+- **Gaps** — the document should have answered this and did not. A screen with no named vendor, a tracking
+  error limit with no measurement basis, no base currency stated
+- **External** — the document could never answer this, and nobody should expect it to. An executed agreement,
+  working settlement instructions, the restricted list file itself, the report distribution list
+
+Conflating those two is how onboarding loses a week. The first is a question for the client. The second is
+work that should already be in flight, and a checklist that does not distinguish them sends people back to
+read a document that was never going to contain the answer.
+
+Onboarding stalls on absence far more than on difficulty. This turns "here are your coded rules" into "here
+is what is stopping this account from trading, and whose desk each item is on."
+
 ## Recall over precision, deliberately
 
 The two error types are not symmetrical. A missed restriction is a potential breach and a client-facing
