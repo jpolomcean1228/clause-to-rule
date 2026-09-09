@@ -1,0 +1,17 @@
+{
+  "client": "Ardsley Family Office — global equity",
+  "note": "No single answer is unusual. The point of this example is that they still add up past the threshold.",
+  "answers": {
+    "vehicle": "commingled_fund",
+    "client_type": "family_office",
+    "custodian": "existing",
+    "jurisdiction": "uk_eu",
+    "funding": "cash",
+    "strategy": "existing_new_bm",
+    "guidelines_source": "consultant_template",
+    "screens": "esg_screens",
+    "derivatives": "no",
+    "reporting": "standard_plus",
+    "fees": "negotiated"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "client": "Halloway Pension Trust — Core Fixed Income",
+  "note": "A mandate that should run on the standard track. Every answer is one we have handled before.",
+  "answers": {
+    "vehicle": "separate_account",
+    "client_type": "corporate_pension",
+    "custodian": "existing",
+    "jurisdiction": "us",
+    "funding": "cash",
+    "strategy": "existing_existing_bm",
+    "guidelines_source": "our_template",
+    "screens": "none",
+    "derivatives": "no",
+    "reporting": "standard",
+    "fees": "standard"
+  }
+}

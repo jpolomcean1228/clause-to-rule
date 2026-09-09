@@ -75,6 +75,37 @@ click.
 These are the dependency notifications that onboarding usually chases by email. They fall out of the same pass
 that drafts the compliance rules, because the classifier has already decided who owns each clause.
 
+## Intake classification
+
+```bash
+node intake/route.mjs --questions
+node intake/route.mjs intake/examples/straightforward.json
+node intake/route.mjs intake/examples/complex.json
+node intake/route.mjs intake/examples/accumulating.json
+```
+
+No API key. Eleven questions asked before anyone reads a document — vehicle, client type, custodian,
+jurisdiction, funding method, strategy, whose paper the guidelines are on, screening, derivatives, reporting,
+fees.
+
+The output is not a completed form. Each answer is known in advance to trigger specific downstream work with a
+named owner, so what comes back is the set of dependencies that just came into existence and who has to start
+on them. A question earns a place in the questionnaire only if the answer changes what somebody has to do.
+Everything else is a field on a form, and forms are where onboarding time goes to hide.
+
+Two routing signals, not one. Any single exception driver takes the client off the template path — sub-advised,
+a custodian new to us, in-kind funding, a performance fee. But the accumulating example is the one worth
+running: every answer is individually ordinary and it still lands on the exception path, because enough
+manageable answers make a mandate nobody should run on the standard track. A router that only looks for
+individually unusual answers misses that case entirely.
+
+Dependencies triggered by more than one answer are deduplicated into a single piece of work, with all its
+causes recorded. The report ranks by lead time and names the critical path.
+
+Lead times are nominal and belong to this repo, not to any real operation. Replace them with measured cycle
+times and this stops being an illustration and becomes a forecast. The structure is the claim: every one of
+these dependencies was knowable on day one, and the reason they surface in week three is that nobody asked.
+
 ## Multi-document conflicts
 
 ```bash

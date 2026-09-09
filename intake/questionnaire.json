@@ -1,0 +1,196 @@
+{
+  "version": "0.1.0",
+  "note": "Intake classification. The value is not in collecting answers — it is that each answer is known in advance to trigger specific downstream work, with a named owner. A question earns its place here only if the answer changes what somebody has to do. Anything that does not is a field on a form, not an intake question.",
+  "routing": {
+    "exception_if_any_driver": true,
+    "weight_threshold": 5,
+    "note": "Any single exception driver routes the client off the template path. Weight is a secondary signal: enough individually-ordinary answers still add up to a mandate nobody should run on the standard track."
+  },
+  "questions": [
+    {
+      "id": "vehicle",
+      "prompt": "What is the vehicle?",
+      "options": [
+        { "value": "separate_account", "label": "Separate account", "exception": false, "weight": 0,
+          "triggers": [{ "item": "Open account in the accounting and order management systems", "owner": "Middle office", "lead_time_days": 5 }] },
+        { "value": "commingled_fund", "label": "Commingled fund / CIT", "exception": false, "weight": 2,
+          "triggers": [
+            { "item": "Confirm capacity and subscription cycle for the fund", "owner": "Product", "lead_time_days": 5 },
+            { "item": "Confirm the fund's own guidelines govern, not client paper", "owner": "Compliance", "lead_time_days": 2 }] },
+        { "value": "sub_advised", "label": "Sub-advised — we manage under another firm's brand", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Sub-advisory agreement review; guidelines arrive on the sponsor's paper", "owner": "Legal", "lead_time_days": 20 },
+            { "item": "Sponsor reporting format and delivery mechanism", "owner": "Client reporting", "lead_time_days": 15 },
+            { "item": "Confirm who owns the compliance monitoring obligation", "owner": "Compliance", "lead_time_days": 10 }],
+          "note": "Sub-advisory brings the most guideline variation, because you inherit language you did not write." },
+        { "value": "ucits", "label": "UCITS or other regulated fund vehicle", "exception": true, "weight": 5,
+          "triggers": [
+            { "item": "UCITS eligibility and diversification rules layered over client guidelines", "owner": "Compliance", "lead_time_days": 25 },
+            { "item": "Depositary appointment and oversight arrangements", "owner": "Legal", "lead_time_days": 30 },
+            { "item": "Regulatory reporting obligations for the domicile", "owner": "Compliance", "lead_time_days": 20 }] }
+      ]
+    },
+    {
+      "id": "client_type",
+      "prompt": "What type of client?",
+      "options": [
+        { "value": "public_pension", "label": "Public pension", "exception": false, "weight": 1,
+          "triggers": [{ "item": "Check for statutory investment restrictions in the plan's jurisdiction", "owner": "Compliance", "lead_time_days": 10 }] },
+        { "value": "corporate_pension", "label": "Corporate pension", "exception": false, "weight": 1,
+          "triggers": [{ "item": "Confirm ERISA status and any plan asset implications", "owner": "Legal", "lead_time_days": 10 }] },
+        { "value": "endowment_foundation", "label": "Endowment or foundation", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "insurance_ga", "label": "Insurance general account", "exception": true, "weight": 3,
+          "triggers": [
+            { "item": "Statutory accounting and capital treatment of holdings", "owner": "Middle office", "lead_time_days": 20 },
+            { "item": "NAIC designation reporting", "owner": "Client reporting", "lead_time_days": 15 }] },
+        { "value": "family_office", "label": "Family office or private client", "exception": false, "weight": 1,
+          "triggers": [{ "item": "Tax lot accounting and any tax-managed overlay", "owner": "Middle office", "lead_time_days": 10 }] }
+      ]
+    },
+    {
+      "id": "custodian",
+      "prompt": "Who is the custodian?",
+      "options": [
+        { "value": "existing", "label": "One we already trade with", "exception": false, "weight": 0,
+          "triggers": [{ "item": "Add account to existing custodian connectivity", "owner": "Middle office", "lead_time_days": 5 }] },
+        { "value": "new_to_us", "label": "New custodian for us", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Establish custodian connectivity and file formats", "owner": "Middle office", "lead_time_days": 40 },
+            { "item": "Standing settlement instructions", "owner": "Middle office", "lead_time_days": 30 },
+            { "item": "Reconciliation feed setup and parallel run", "owner": "Middle office", "lead_time_days": 35 }],
+          "note": "Consistently the longest pole in the tent. Nothing else on this list moves the funding date as much." },
+        { "value": "client_directed_multiple", "label": "Multiple custodians directed by the client", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Allocation and settlement logic across custodians", "owner": "Middle office", "lead_time_days": 30 },
+            { "item": "Confirm which custodian is the book of record", "owner": "Middle office", "lead_time_days": 10 }] }
+      ]
+    },
+    {
+      "id": "jurisdiction",
+      "prompt": "Client domicile?",
+      "options": [
+        { "value": "us", "label": "United States", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "uk_eu", "label": "UK or EU", "exception": false, "weight": 2,
+          "triggers": [
+            { "item": "GDPR handling for client and beneficiary data", "owner": "Legal", "lead_time_days": 10 },
+            { "item": "MiFID II reporting obligations if applicable", "owner": "Compliance", "lead_time_days": 15 }] },
+        { "value": "other", "label": "Elsewhere", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Local regulatory registration and marketing rules review", "owner": "Legal", "lead_time_days": 30 },
+            { "item": "Tax treaty and withholding review", "owner": "Middle office", "lead_time_days": 20 }] }
+      ]
+    },
+    {
+      "id": "funding",
+      "prompt": "How is the account being funded?",
+      "options": [
+        { "value": "cash", "label": "Cash", "exception": false, "weight": 0,
+          "triggers": [{ "item": "Agree funding date and wire instructions", "owner": "Middle office", "lead_time_days": 5 }] },
+        { "value": "in_kind", "label": "In-kind transfer of existing assets", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Legacy asset review against the new guidelines", "owner": "Compliance", "lead_time_days": 15 },
+            { "item": "Transition management plan and cost estimate", "owner": "Trading", "lead_time_days": 20 },
+            { "item": "Cost basis and tax lot transfer from prior manager", "owner": "Middle office", "lead_time_days": 15 }],
+          "note": "In-kind funding routinely arrives holding positions the new guidelines prohibit. That is a conversation, not a trade." },
+        { "value": "mixed", "label": "Cash and in-kind", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Legacy asset review against the new guidelines", "owner": "Compliance", "lead_time_days": 15 },
+            { "item": "Transition management plan and cost estimate", "owner": "Trading", "lead_time_days": 20 }] }
+      ]
+    },
+    {
+      "id": "strategy",
+      "prompt": "What is being managed?",
+      "options": [
+        { "value": "existing_existing_bm", "label": "Existing strategy, existing benchmark", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "existing_new_bm", "label": "Existing strategy, benchmark we do not currently use", "exception": false, "weight": 2,
+          "triggers": [
+            { "item": "License and load the benchmark; confirm index data rights", "owner": "Middle office", "lead_time_days": 20 },
+            { "item": "Composite treatment for a non-standard benchmark", "owner": "Performance", "lead_time_days": 10 }] },
+        { "value": "new_strategy", "label": "New or customised strategy", "exception": true, "weight": 5,
+          "triggers": [
+            { "item": "New composite creation and GIPS treatment", "owner": "Performance", "lead_time_days": 20 },
+            { "item": "Model portfolio and capacity review", "owner": "Product", "lead_time_days": 25 },
+            { "item": "New strategy approval through product governance", "owner": "Product", "lead_time_days": 30 }] }
+      ]
+    },
+    {
+      "id": "guidelines_source",
+      "prompt": "Whose paper are the guidelines on?",
+      "options": [
+        { "value": "our_template", "label": "Our standard guidelines template", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "consultant_template", "label": "A consultant's template", "exception": false, "weight": 2,
+          "triggers": [{ "item": "Map consultant language to our rule archetypes", "owner": "Compliance", "lead_time_days": 10 }] },
+        { "value": "client_paper", "label": "Client's own paper", "exception": true, "weight": 3,
+          "triggers": [
+            { "item": "Full guideline extraction and archetype mapping", "owner": "Compliance", "lead_time_days": 15 },
+            { "item": "Legal review of non-standard restriction language", "owner": "Legal", "lead_time_days": 15 }],
+          "note": "This is the case the extraction console exists for." }
+      ]
+    },
+    {
+      "id": "screens",
+      "prompt": "Any exclusionary screening?",
+      "options": [
+        { "value": "none", "label": "None", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "restricted_list", "label": "Client restricted list", "exception": false, "weight": 2,
+          "triggers": [
+            { "item": "Establish restricted list delivery mechanism and update cadence", "owner": "Compliance", "lead_time_days": 15 },
+            { "item": "Agree match basis — issuer, CUSIP, parent entity", "owner": "Compliance", "lead_time_days": 5 }] },
+        { "value": "esg_screens", "label": "ESG or revenue-threshold screens", "exception": false, "weight": 3,
+          "triggers": [
+            { "item": "Confirm ESG data vendor and licence coverage", "owner": "Compliance", "lead_time_days": 20 },
+            { "item": "Screening exception reporting in the client package", "owner": "Client reporting", "lead_time_days": 15 }] },
+        { "value": "both", "label": "Both a restricted list and ESG screens", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Establish restricted list delivery mechanism and update cadence", "owner": "Compliance", "lead_time_days": 15 },
+            { "item": "Confirm ESG data vendor and licence coverage", "owner": "Compliance", "lead_time_days": 20 },
+            { "item": "Resolve overlap between the two screen sets", "owner": "Compliance", "lead_time_days": 10 }] }
+      ]
+    },
+    {
+      "id": "derivatives",
+      "prompt": "Are derivatives permitted?",
+      "options": [
+        { "value": "no", "label": "No", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "hedging_only", "label": "Hedging and efficient portfolio management only", "exception": true, "weight": 3,
+          "triggers": [
+            { "item": "ISDA and CSA negotiation with counterparties", "owner": "Legal", "lead_time_days": 60 },
+            { "item": "Collateral management setup", "owner": "Middle office", "lead_time_days": 30 }],
+          "note": "ISDA negotiation runs on a legal timeline, not an operations one. It rarely compresses." },
+        { "value": "full", "label": "Broad derivatives usage including leverage", "exception": true, "weight": 5,
+          "triggers": [
+            { "item": "ISDA and CSA negotiation with counterparties", "owner": "Legal", "lead_time_days": 60 },
+            { "item": "Collateral and margin operations setup", "owner": "Middle office", "lead_time_days": 35 },
+            { "item": "Leverage and exposure monitoring configuration", "owner": "Risk", "lead_time_days": 20 }] }
+      ]
+    },
+    {
+      "id": "reporting",
+      "prompt": "What reporting does the client need?",
+      "options": [
+        { "value": "standard", "label": "Our standard package", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "standard_plus", "label": "Standard package with additions", "exception": false, "weight": 2,
+          "triggers": [{ "item": "Check the report catalog before building anything new", "owner": "Client reporting", "lead_time_days": 10 }] },
+        { "value": "custom", "label": "Bespoke format or client template", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Report build and sign-off cycle", "owner": "Client reporting", "lead_time_days": 30 },
+            { "item": "Confirm data availability for every requested field", "owner": "Client reporting", "lead_time_days": 10 }] }
+      ]
+    },
+    {
+      "id": "fees",
+      "prompt": "What is the fee arrangement?",
+      "options": [
+        { "value": "standard", "label": "Standard schedule", "exception": false, "weight": 0, "triggers": [] },
+        { "value": "negotiated", "label": "Negotiated rate or breakpoints", "exception": false, "weight": 1,
+          "triggers": [{ "item": "Configure the breakpoint schedule in billing", "owner": "Billing", "lead_time_days": 5 }] },
+        { "value": "performance_fee", "label": "Performance or incentive fee", "exception": true, "weight": 4,
+          "triggers": [
+            { "item": "Performance fee calculation methodology and hurdle definition", "owner": "Billing", "lead_time_days": 25 },
+            { "item": "Crystallisation schedule and high water mark tracking", "owner": "Billing", "lead_time_days": 20 },
+            { "item": "Independent verification of the fee calculation", "owner": "Performance", "lead_time_days": 15 }] }
+      ]
+    }
+  ]
+}

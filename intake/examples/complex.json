@@ -1,0 +1,17 @@
+{
+  "client": "Meridian PERS — sub-advised global mandate",
+  "note": "Several answers that are individually manageable and collectively a different kind of project.",
+  "answers": {
+    "vehicle": "sub_advised",
+    "client_type": "public_pension",
+    "custodian": "new_to_us",
+    "jurisdiction": "uk_eu",
+    "funding": "in_kind",
+    "strategy": "existing_new_bm",
+    "guidelines_source": "client_paper",
+    "screens": "both",
+    "derivatives": "hedging_only",
+    "reporting": "custom",
+    "fees": "performance_fee"
+  }
+}
