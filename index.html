@@ -269,6 +269,45 @@
   .flags li { margin-bottom: 3px; }
   .precedent { font-size: 12.5px; color: var(--slate-soft); margin: 0 0 10px; }
 
+  .precedent-box {
+    border-top: 1px solid #eef0f3;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .precedent-box .who { font-size: 12px; color: var(--slate-soft); margin-bottom: 6px; }
+  .precedent-box .who b { color: var(--ink); font-weight: 600; }
+  .diff-row {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 12.5px;
+    padding: 2px 0;
+  }
+  .diff-row .k { color: var(--ink-soft); min-width: 38%; }
+  .diff-row .v { font-family: var(--mono); font-size: 12px; }
+  .diff-row.same .v { color: var(--approve); }
+  .diff-row.differs .v { color: var(--review); }
+  .diff-row.newp .v { color: var(--primary); }
+  .diff-row.missing .v { color: var(--escalate); }
+  .diff-row.missing .k { color: var(--escalate); }
+  .nomatch { font-size: 12.5px; color: var(--slate-soft); }
+
+  .checklist { margin-top: 34px; border-top: 2px solid var(--slate-deep); padding-top: 16px; }
+  .cl-group { background: #fff; border: 1px solid var(--rule); border-radius: 3px; margin-bottom: 10px; }
+  .cl-group > h3 {
+    margin: 0;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--rule);
+    background: #fbfbfa;
+  }
+  .cl-item { display: flex; gap: 12px; padding: 9px 14px; border-bottom: 1px solid #eef0f3; font-size: 13.5px; }
+  .cl-item:last-child { border-bottom: 0; }
+  .cl-item .cid { font-family: var(--mono); font-size: 12px; color: var(--slate-soft); flex: none; }
+  .copybtn { border: 1px solid var(--rule); background: #fff; border-radius: 3px; padding: 6px 12px; font-size: 13px; }
+  .copybtn:hover { border-color: var(--primary); color: var(--primary); }
+
   .actions { display: flex; gap: 8px; padding: 11px 16px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
   .actions button { border: 1px solid var(--rule); background: #fff; border-radius: 3px; padding: 7px 14px; font-weight: 500; }
   .actions .ok { border-color: var(--approve); color: var(--approve); }
@@ -347,6 +386,8 @@
     <div id="errbox"></div>
     <h2>Review queue</h2>
     <div id="queue"></div>
+
+    <div class="checklist" id="checklist"></div>
 
     <div class="ledger">
       <h2>Decision log</h2>
@@ -441,6 +482,87 @@ const ARCHETYPES = [
   ["TRACKING_ERROR_LIMIT","Tracking error limit","max_bps, benchmark, measurement_basis, window"],
   ["CURRENCY_HEDGE","Currency hedging requirement","hedge_ratio_pct, tolerance_band, base_currency"]
 ];
+
+/**
+ * Rules already coded for prior accounts. In production this is a query against the compliance
+ * engine, not a constant. It is inlined rather than kept in a separate JSON file for the same
+ * reason the eval parses the prompt out of this file: a second copy drifts.
+ */
+const PRECEDENTS = [
+  { account: "Ridgeline Endowment", coded: "2025-11-14", archetype_id: "ISSUER_CONCENTRATION",
+    parameters: [{ name: "limit_pct", value: "4" }, { name: "basis", value: "market value" }, { name: "scope", value: "per issuer" }] },
+  { account: "Halloway Pension Trust", coded: "2026-02-03", archetype_id: "ISSUER_CONCENTRATION",
+    parameters: [{ name: "limit_pct", value: "5" }, { name: "basis", value: "market value" }, { name: "scope", value: "per issuer, ex-sovereign" }] },
+  { account: "Halloway Pension Trust", coded: "2026-02-03", archetype_id: "CREDIT_RATING_FLOOR",
+    parameters: [{ name: "minimum_rating", value: "BBB-" }, { name: "agency", value: "S&P" }, { name: "test_point", value: "at purchase" }, { name: "cure_period", value: "60 days" }] },
+  { account: "Ridgeline Endowment", coded: "2025-11-14", archetype_id: "DURATION_BAND",
+    parameters: [{ name: "relative_to", value: "benchmark" }, { name: "min", value: "-0.5" }, { name: "max", value: "+0.5" }, { name: "measure", value: "effective duration" }] },
+  { account: "Kestrel Insurance GA", coded: "2026-01-21", archetype_id: "PROHIBITED_INSTRUMENT",
+    parameters: [{ name: "instrument_classes", value: "private placements, commodities, direct real estate, CLO equity" }] },
+  { account: "Kestrel Insurance GA", coded: "2026-01-21", archetype_id: "DERIVATIVES_USAGE",
+    parameters: [{ name: "permitted_purposes", value: "hedging only" }, { name: "leverage_permitted", value: "no" }, { name: "notional_cap_pct", value: "15" }] },
+  { account: "Halloway Pension Trust", coded: "2026-02-03", archetype_id: "RESTRICTED_LIST",
+    parameters: [{ name: "list_source", value: "client SFTP, weekly" }, { name: "match_basis", value: "issuer CUSIP + parent" }, { name: "update_frequency", value: "weekly" }] },
+  { account: "Ridgeline Endowment", coded: "2025-11-14", archetype_id: "SECTOR_LIMIT",
+    parameters: [{ name: "limit_pct", value: "500 bps over benchmark" }, { name: "sector_scheme", value: "GICS" }, { name: "relative_to", value: "benchmark weight" }] },
+  { account: "Ardsley Family Office", coded: "2026-03-18", archetype_id: "GEOGRAPHIC_LIMIT",
+    parameters: [{ name: "limit_pct", value: "20" }, { name: "region", value: "emerging markets" }, { name: "classification_source", value: "MSCI country classification" }] },
+  { account: "Ardsley Family Office", coded: "2026-03-18", archetype_id: "ESG_SCREEN",
+    parameters: [{ name: "activity", value: "thermal coal extraction" }, { name: "revenue_threshold_pct", value: "5" }, { name: "data_vendor", value: "MSCI ESG Research" }, { name: "look_through", value: "issuer level" }] },
+  { account: "Ardsley Family Office", coded: "2026-03-18", archetype_id: "TRACKING_ERROR_LIMIT",
+    parameters: [{ name: "max_bps", value: "350" }, { name: "measurement_basis", value: "ex ante" }, { name: "window", value: "monthly" }] },
+  { account: "Kestrel Insurance GA", coded: "2026-01-21", archetype_id: "LIQUIDITY_MINIMUM",
+    parameters: [{ name: "minimum_pct", value: "2" }, { name: "eligible_instruments", value: "cash and equivalents" }, { name: "test_frequency", value: "daily" }] },
+  { account: "Ardsley Family Office", coded: "2026-03-18", archetype_id: "CURRENCY_HEDGE",
+    parameters: [{ name: "hedge_ratio_pct", value: "100" }, { name: "tolerance_band", value: "+/- 3" }, { name: "base_currency", value: "USD" }] }
+];
+
+const normName = n => String(n || "").toLowerCase().replace(/[^a-z]/g, "");
+const normVal = v => String(v == null ? "" : v).toLowerCase().replace(/\s+/g, " ").trim();
+
+/**
+ * Nearest previously coded rule of the same archetype, chosen by parameter overlap.
+ * A reviewer comparing against precedent works far faster than one reading a blank proposal,
+ * and the comparison is what surfaces reuse without anyone having to remember it exists.
+ */
+function findPrecedent(pred) {
+  if (!pred.archetype_id) return null;
+  const pool = PRECEDENTS.filter(r => r.archetype_id === pred.archetype_id);
+  if (!pool.length) return null;
+  const proposed = (pred.parameters || []).map(p => normName(p.name));
+  // Rank on shared parameter names first, then on matching values, so a 5% cap matches the
+  // account that also coded 5% rather than whichever candidate happened to be listed first.
+  let best = pool[0], bestScore = [-1, -1];
+  for (const cand of pool) {
+    const names = cand.parameters.filter(p => proposed.includes(normName(p.name))).length;
+    const values = cand.parameters.filter(p => (pred.parameters || []).some(
+      x => normName(x.name) === normName(p.name) && normVal(x.value) === normVal(p.value))).length;
+    if (names > bestScore[0] || (names === bestScore[0] && values > bestScore[1])) {
+      best = cand; bestScore = [names, values];
+    }
+  }
+  const rows = [];
+  const seen = new Set();
+  for (const pp of best.parameters) {
+    const match = (pred.parameters || []).find(x => normName(x.name) === normName(pp.name));
+    if (match) {
+      seen.add(normName(pp.name));
+      rows.push({
+        kind: normVal(match.value) === normVal(pp.value) ? "same" : "differs",
+        name: pp.name,
+        text: normVal(match.value) === normVal(pp.value) ? match.value : pp.value + "  \u2192  " + match.value
+      });
+    } else {
+      // Precedent carries a parameter this proposal does not. Usually the most informative row
+      // on the card: it is how a reviewer notices a measurement basis or test point went missing.
+      rows.push({ kind: "missing", name: pp.name, text: pp.value + "  \u2192  not extracted" });
+    }
+  }
+  for (const x of (pred.parameters || [])) {
+    if (!seen.has(normName(x.name))) rows.push({ kind: "newp", name: x.name, text: x.value + "  (not in precedent)" });
+  }
+  return { ...best, rows };
+}
 
 const OWNERS = {
   RESTRICTION: "Compliance — codes to the compliance engine",
@@ -635,6 +757,8 @@ function render() {
   document.getElementById("c-edit").textContent = state.proposals.filter(p => p.edited).length;
   document.getElementById("c-rej").textContent = state.proposals.filter(p => p.status === "rejected").length;
 
+  renderChecklist();
+
   const log = document.getElementById("log");
   log.innerHTML = state.log.length
     ? state.log.map(r => "<tr><td class='m'>" + esc(r.id) + "</td><td>" + esc(r.rule) +
@@ -683,10 +807,60 @@ function card(p, i) {
           ? (params ? "<table class='params'>" + params + "</table>" : "<p class='rationale'>No parameters extracted.</p>")
           : "<p class='rationale'>" + esc(p.summary || "") + "</p>") +
         (p.rationale ? "<p class='rationale'>" + esc(p.rationale) + "</p>" : "") +
-        exceptions + flags +
+        exceptions + flags + precedentBlock(p) +
       "</div>" +
     "</div>" + foot + "</article>";
 }
+
+function precedentBlock(p) {
+  if (p.classification !== "RESTRICTION") return "";
+  const pr = findPrecedent(p);
+  if (!pr) {
+    return "<div class='precedent-box'><span class='nomatch'>No prior rule of this archetype. " +
+      "First of its kind for the book, so there is nothing to compare against.</span></div>";
+  }
+  const rows = pr.rows.map(r =>
+    "<div class='diff-row " + r.kind + "'><span class='k'>" + esc(r.name) + "</span>" +
+    "<span class='v'>" + esc(r.text) + "</span></div>").join("");
+  return "<div class='precedent-box'><div class='who'>Nearest precedent — <b>" + esc(pr.account) +
+    "</b>, coded " + esc(pr.coded) + "</div>" + rows + "</div>";
+}
+
+/* ---------- onboarding checklist ---------- */
+
+function renderChecklist() {
+  const el = document.getElementById("checklist");
+  const items = state.proposals.filter(p => p.classification && p.classification !== "RESTRICTION" && p.classification !== "BOILERPLATE");
+  if (!items.length) {
+    el.innerHTML = "<h2>Onboarding checklist</h2><p class='nomatch'>" +
+      "Non-restriction clauses land here as work items for the teams that own them. " +
+      "Extract a mandate to populate it.</p>";
+    return;
+  }
+  const groups = {};
+  for (const p of items) (groups[p.classification] ||= []).push(p);
+  const order = ["FEE", "REPORTING", "OPERATIONAL", "PERFORMANCE"];
+  const keys = Object.keys(groups).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  el.innerHTML = "<h2>Onboarding checklist</h2>" +
+    keys.map(k => "<div class='cl-group'><h3>" + esc(OWNERS[k] || k) + "</h3>" +
+      groups[k].map(p => "<div class='cl-item'><span class='cid'>" + esc(p.clause.id) + "</span><span>" +
+        esc(p.summary || p.rationale || "Review clause and action.") + "</span></div>").join("") +
+      "</div>").join("") +
+    "<button class='copybtn' onclick='copyChecklist()'>Copy checklist</button>" +
+    "<p style='font-size:12.5px;color:var(--slate-soft);margin:10px 0 0;max-width:70ch'>" +
+    "These are the dependency notifications onboarding usually chases by email. They fall out of the same " +
+    "pass that drafts the compliance rules, because the classifier has already decided who owns each clause.</p>";
+}
+
+window.copyChecklist = function () {
+  const items = state.proposals.filter(p => p.classification && p.classification !== "RESTRICTION" && p.classification !== "BOILERPLATE");
+  const groups = {};
+  for (const p of items) (groups[p.classification] ||= []).push(p);
+  const text = Object.entries(groups).map(([k, v]) =>
+    (OWNERS[k] || k) + "\n" + v.map(p => "  [" + p.clause.id + "] " + (p.summary || "")).join("\n")
+  ).join("\n\n");
+  navigator.clipboard.writeText(text);
+};
 
 /* ---------- decisions ---------- */
 

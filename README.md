@@ -50,6 +50,31 @@ Routing thresholds live in `tierOf()`:
 Tiering is what makes this a throughput tool rather than an autonomy claim. The queue is triaged, not
 eliminated.
 
+## Precedent, not a blank page
+
+Every restriction proposal is compared against the nearest previously coded rule of the same archetype, chosen
+on shared parameter names and then on matching values. The reviewer sees a parameter-level diff rather than an
+empty form: what matches precedent, what differs, what is new, and — most usefully — what the precedent
+carries that this proposal does not.
+
+That last row is the one that earns its place. When a tracking error rule comes back without a measurement
+basis, or a revenue screen without a data vendor, the diff surfaces it in red because a prior account had that
+parameter and this one lost it. It catches the same gaps the model is asked to flag, through an independent
+mechanism. Two ways of noticing the same problem is a better safety property than one.
+
+It is also what makes the reuse argument concrete. A reviewer confirming that a 5% issuer cap matches what was
+coded for another account last quarter is doing something categorically faster than authoring the rule, and the
+comparison happens without anyone having to remember the precedent exists.
+
+## Onboarding checklist
+
+Non-restriction clauses do not vanish. Fee terms, reporting obligations, custody and settlement instructions
+and composite assignments are grouped by the team that owns them and rendered as work items, copyable in one
+click.
+
+These are the dependency notifications that onboarding usually chases by email. They fall out of the same pass
+that drafts the compliance rules, because the classifier has already decided who owns each clause.
+
 ## Recall over precision, deliberately
 
 The two error types are not symmetrical. A missed restriction is a potential breach and a client-facing
@@ -119,8 +144,8 @@ The harness above covers the mechanics. With real access, this is how it should 
 
 - No write path to a compliance engine. Approved rules land in a log, which is where the boundary belongs
 - No document ingestion for scanned PDFs
-- No retrieval against prior coded mandates. The precedent diff — showing a reviewer the nearest existing rule
-  rather than a blank proposal — is the highest-value next addition
+- Precedent is matched against an inlined constant standing in for a compliance engine query. Real retrieval
+  would rank on clause-text similarity as well as parameter overlap
 - No authentication, persistence or multi-user review state
 
 ## Running it
