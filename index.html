@@ -1,0 +1,725 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guideline intake console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #f8f7f4;
+    --ink: #1a1917;
+    --ink-soft: #5c5a55;
+    --slate: #edeff2;
+    --slate-deep: #2b3440;
+    --slate-soft: #6b7684;
+    --rule: #d3d8de;
+    --primary: #1f3a5f;
+    --approve: #2e6b4f;
+    --review: #8f6a18;
+    --escalate: #a03a2c;
+    --sans: "Public Sans", system-ui, sans-serif;
+    --serif: "Newsreader", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--slate);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  button { font-family: inherit; font-size: inherit; cursor: pointer; }
+  button:focus-visible, textarea:focus-visible, input:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead {
+    background: var(--slate-deep);
+    color: #f2f4f6;
+    padding: 22px 28px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 40px;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .masthead h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 27px;
+    margin: 0 0 5px;
+    letter-spacing: -0.01em;
+  }
+  .masthead p {
+    margin: 0;
+    color: #a9b4c0;
+    font-size: 13.5px;
+    max-width: 56ch;
+  }
+  .counters { display: flex; gap: 26px; }
+  .counter b {
+    display: block;
+    font-family: var(--mono);
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.1;
+  }
+  .counter span { font-size: 12px; color: #a9b4c0; }
+
+  /* ---------- shell ---------- */
+
+  .shell {
+    display: grid;
+    grid-template-columns: 370px minmax(0, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    min-height: calc(100vh - 92px);
+  }
+  .rail { background: var(--paper); padding: 22px 22px 40px; }
+  .stage { background: var(--slate); padding: 22px 24px 60px; min-width: 0; }
+
+  .rail h2, .stage h2 {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+    letter-spacing: 0.02em;
+  }
+  .rail h2 + h2 { margin-top: 26px; }
+
+  .samples { display: flex; flex-direction: column; gap: 7px; margin-bottom: 22px; }
+  .samples button {
+    text-align: left;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 9px 11px;
+    line-height: 1.35;
+  }
+  .samples button:hover { border-color: var(--primary); }
+  .samples button b { display: block; font-weight: 600; font-size: 13.5px; }
+  .samples button span { font-size: 12px; color: var(--ink-soft); }
+
+  textarea {
+    width: 100%;
+    height: 240px;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: #fff;
+    font-family: var(--serif);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .go {
+    width: 100%;
+    margin-top: 12px;
+    background: var(--primary);
+    color: #fff;
+    border: 0;
+    border-radius: 3px;
+    padding: 11px;
+    font-weight: 600;
+  }
+  .go:hover { background: #172c48; }
+  .go[disabled] { background: var(--slate-soft); cursor: default; }
+
+  .keyrow { margin-top: 14px; font-size: 12.5px; color: var(--ink-soft); }
+  .keyrow input {
+    width: 100%;
+    margin-top: 5px;
+    padding: 8px 9px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  /* ---------- pipeline stages (a genuine sequence, so numbered) ---------- */
+
+  .pipeline { margin-top: 26px; border-top: 1px solid var(--rule); padding-top: 16px; }
+  .pipeline ol { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  .pipeline li {
+    counter-increment: step;
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    padding: 5px 0;
+    font-size: 13px;
+    color: var(--slate-soft);
+  }
+  .pipeline li::before {
+    content: counter(step);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--slate-soft);
+    border: 1px solid var(--rule);
+    border-radius: 50%;
+    width: 19px;
+    height: 19px;
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+  .pipeline li.on { color: var(--ink); font-weight: 500; }
+  .pipeline li.on::before { border-color: var(--primary); color: var(--primary); }
+  .pipeline li.done { color: var(--approve); }
+  .pipeline li.done::before { border-color: var(--approve); color: var(--approve); }
+
+  /* ---------- proposals ---------- */
+
+  .empty {
+    background: #fff;
+    border: 1px dashed var(--rule);
+    border-radius: 3px;
+    padding: 40px 30px;
+    max-width: 60ch;
+  }
+  .empty h3 { font-family: var(--serif); font-weight: 500; font-size: 21px; margin: 0 0 8px; }
+  .empty p { margin: 0 0 10px; color: var(--ink-soft); font-size: 14px; }
+
+  .proposal {
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .proposal.settled { opacity: 0.55; }
+
+  .phead {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--rule);
+    background: #fbfbfa;
+  }
+  .phead .cid { font-family: var(--mono); font-size: 12px; color: var(--slate-soft); }
+  .phead .title { font-weight: 600; font-size: 14.5px; }
+  .phead .spacer { flex: 1; }
+
+  .chip {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .chip.auto { color: var(--approve); }
+  .chip.review { color: var(--review); }
+  .chip.escalate { color: var(--escalate); }
+  .chip.other { color: var(--slate-soft); }
+  .conf { font-family: var(--mono); font-size: 12px; color: var(--slate-soft); }
+
+  /* the split: warm paper for the client's words, cool slate for the machine's */
+  .pbody { display: grid; grid-template-columns: 1fr 1fr; }
+  .clause {
+    background: var(--paper);
+    padding: 16px 18px;
+    border-right: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-size: 14.5px;
+    line-height: 1.62;
+  }
+  .clause .cite {
+    display: block;
+    font-family: var(--sans);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .rulepanel { padding: 16px 18px; background: #fff; }
+
+  table.params { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+  table.params th, table.params td {
+    text-align: left;
+    padding: 5px 0;
+    border-bottom: 1px solid #eef0f3;
+    vertical-align: top;
+    font-size: 13px;
+  }
+  table.params th { width: 40%; font-weight: 400; color: var(--ink-soft); }
+  table.params td { font-family: var(--mono); font-size: 12.5px; }
+  table.params input {
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 3px 5px;
+    border: 1px solid var(--primary);
+    border-radius: 2px;
+  }
+
+  .rationale { font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
+  .flags { margin: 0 0 10px; padding-left: 17px; font-size: 13px; color: var(--escalate); }
+  .flags li { margin-bottom: 3px; }
+  .precedent { font-size: 12.5px; color: var(--slate-soft); margin: 0 0 10px; }
+
+  .actions { display: flex; gap: 8px; padding: 11px 16px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
+  .actions button { border: 1px solid var(--rule); background: #fff; border-radius: 3px; padding: 7px 14px; font-weight: 500; }
+  .actions .ok { border-color: var(--approve); color: var(--approve); }
+  .actions .ok:hover { background: var(--approve); color: #fff; }
+  .actions .no { border-color: var(--escalate); color: var(--escalate); }
+  .actions .no:hover { background: var(--escalate); color: #fff; }
+  .actions .ed:hover { border-color: var(--primary); color: var(--primary); }
+  .verdict { padding: 11px 16px; border-top: 1px solid var(--rule); font-size: 13px; font-weight: 500; }
+
+  /* ---------- ledger ---------- */
+
+  .ledger { margin-top: 34px; border-top: 2px solid var(--slate-deep); padding-top: 16px; }
+  .ledger table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--rule); }
+  .ledger th, .ledger td { text-align: left; padding: 8px 11px; border-bottom: 1px solid var(--rule); font-size: 12.5px; }
+  .ledger th { font-weight: 600; color: var(--ink-soft); font-size: 11.5px; }
+  .ledger td.m { font-family: var(--mono); font-size: 12px; }
+  .ledger tr:last-child td { border-bottom: 0; }
+
+  .err {
+    background: #fdf3f2;
+    border: 1px solid var(--escalate);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--escalate);
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; }
+    .pbody { grid-template-columns: 1fr; }
+    .clause { border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="masthead">
+  <div>
+    <h1>Guideline intake console</h1>
+    <p>Drafts compliance rules from mandate documents and routes them for review. Nothing is coded on model output alone.</p>
+  </div>
+  <div class="counters">
+    <div class="counter"><b id="c-prop">0</b><span>proposed</span></div>
+    <div class="counter"><b id="c-appr">0</b><span>approved</span></div>
+    <div class="counter"><b id="c-edit">0</b><span>edited</span></div>
+    <div class="counter"><b id="c-rej">0</b><span>rejected</span></div>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail">
+    <h2>Load a mandate</h2>
+    <div class="samples" id="samples"></div>
+
+    <h2>Document text</h2>
+    <textarea id="doc" placeholder="Paste the investment guidelines schedule, side letter, or IMA exhibit."></textarea>
+    <button class="go" id="go">Extract rules</button>
+
+    <div class="keyrow" id="keyrow" hidden>
+      Anthropic API key (kept in memory, never stored)
+      <input id="key" type="password" placeholder="sk-ant-..." autocomplete="off">
+    </div>
+
+    <div class="pipeline">
+      <h2>Pipeline</h2>
+      <ol id="steps">
+        <li data-s="0">Segment into operative clauses</li>
+        <li data-s="1">Classify and route by owner</li>
+        <li data-s="2">Match to a rule archetype</li>
+        <li data-s="3">Score confidence and tier</li>
+      </ol>
+    </div>
+  </aside>
+
+  <section class="stage">
+    <div id="errbox"></div>
+    <h2>Review queue</h2>
+    <div id="queue"></div>
+
+    <div class="ledger">
+      <h2>Decision log</h2>
+      <table>
+        <thead><tr><th>Clause</th><th>Rule</th><th>Decision</th><th>Confidence</th><th>Time</th></tr></thead>
+        <tbody id="log"><tr><td colspan="5" style="color:var(--slate-soft)">No decisions yet.</td></tr></tbody>
+      </table>
+      <p style="font-size:12.5px;color:var(--slate-soft);margin:10px 0 0;max-width:70ch">
+        Every edit and rejection is a labelled example. In a production build this log is the training corpus that
+        improves archetype matching, and the audit trail that lets compliance reconstruct why any rule was coded.
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+const MODEL = "claude-sonnet-4-6";
+const MAX_CLAUSES = 12;
+
+const SAMPLES = [
+  { id: "meridian", name: "Meridian PERS — Core Fixed Income",
+    note: "Rating floor with a cure period, a double negative on derivatives, a list by reference.",
+    file: "samples/meridian-core-fixed-income.txt" },
+  { id: "calder", name: "Calder Foundation — Global Equity",
+    note: "Benchmark-relative sector cap, screens with no named vendor, unspecified tracking error basis.",
+    file: "samples/calder-global-equity.txt" }
+];
+
+// Inlined so the console runs from file:// with no server.
+const SAMPLE_TEXT = {
+  meridian: `INVESTMENT MANAGEMENT AGREEMENT — SCHEDULE B
+Meridian Public Employees' Retirement System
+Mandate: Core Fixed Income (separate account)
+Benchmark: Bloomberg US Aggregate Bond Index
+
+B.1 Concentration. No more than five percent (5%) of the market value of the Account shall be invested in the securities of any single issuer, provided that this limitation shall not apply to obligations issued or guaranteed by the United States government or its agencies, or to cash and cash equivalents.
+
+B.2 Credit Quality. Securities purchased for the Account shall carry a minimum rating of Baa3 by Moody's or BBB- by Standard & Poor's at the time of purchase. Where the two agencies assign split ratings, the lower shall govern. Securities downgraded below the minimum after purchase need not be sold immediately, but shall be disposed of within ninety (90) days unless the Client agrees otherwise in writing.
+
+B.3 Duration. The effective duration of the Account shall be maintained within plus or minus one (1) year of the effective duration of the Benchmark.
+
+B.4 Prohibited Instruments. The Manager shall not invest the Account in private placements, commodities, or direct real estate. The Manager is not prohibited from using interest rate futures and interest rate swaps solely for the purpose of managing portfolio duration, and shall not employ such instruments to create economic leverage.
+
+B.5 Restricted Securities. The Manager shall not purchase any security appearing on the Client's restricted securities list, as delivered to the Manager and updated from time to time in accordance with Appendix IV.
+
+B.6 Management Fee. The Manager shall be paid a fee, billed quarterly in arrears, of 22 basis points per annum on the first $100 million of average daily market value and 18 basis points per annum on amounts above that level.
+
+B.7 Reporting. The Manager shall deliver a monthly performance and holdings report within ten (10) business days of month end, and a quarterly attribution report including duration and sector positioning against the Benchmark within twenty (20) business days of quarter end.
+
+B.8 Custody. Assets of the Account shall be held by Northern Trust Company as custodian. The Manager shall transmit trade instructions to the custodian by 11:00 a.m. Eastern on trade date plus one.
+
+B.9 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of Illinois, without regard to its conflict of laws principles.`,
+
+  calder: `INVESTMENT GUIDELINES — EXHIBIT A
+The Calder Foundation
+Mandate: Global Equity, screened (separate account)
+Benchmark: MSCI ACWI
+
+A.1 Sector Exposure. Exposure to any single GICS sector shall not exceed the weight of that sector in the Benchmark by more than seven hundred fifty (750) basis points.
+
+A.2 Emerging Markets. Not more than fifteen percent (15%) of the market value of the Account may be invested in issuers domiciled in countries classified as emerging markets by the Benchmark provider.
+
+A.3 Exclusionary Screens. The Account shall exclude issuers deriving more than five percent (5%) of revenue from thermal coal extraction, and issuers deriving any revenue from the manufacture of controversial weapons. Screening shall be applied at the issuer level.
+
+A.4 Tracking Error. The Manager shall manage the Account with a view to maintaining tracking error against the Benchmark of no more than four hundred (400) basis points.
+
+A.5 Cash. The Account shall hold not less than one percent (1%) and not more than five percent (5%) of market value in cash and cash equivalents, tested at month end.
+
+A.6 Currency. The Manager shall not hedge currency exposure except as otherwise agreed in writing between the parties.
+
+A.7 Management Fee. Forty (40) basis points per annum on average daily market value, billed quarterly in arrears, subject to an annual minimum fee of $150,000.
+
+A.8 Reporting. The Manager shall provide a quarterly report including holdings, performance against the Benchmark, and a summary of screening exceptions identified during the period.`
+};
+
+const ARCHETYPES = [
+  ["ISSUER_CONCENTRATION","Issuer concentration limit","limit_pct, basis, scope, aggregation"],
+  ["SECTOR_LIMIT","Sector exposure limit","limit_pct, sector_scheme, relative_to"],
+  ["GEOGRAPHIC_LIMIT","Country or region exposure limit","limit_pct, region, classification_source"],
+  ["CREDIT_RATING_FLOOR","Minimum credit quality","minimum_rating, agency, multi_agency_rule, test_point, cure_period"],
+  ["DURATION_BAND","Portfolio duration band","min, max, relative_to, measure"],
+  ["MATURITY_LIMIT","Maximum maturity","max_years, measure, scope"],
+  ["PROHIBITED_INSTRUMENT","Prohibited instrument or asset class","instrument_classes, permitted_purposes"],
+  ["LIQUIDITY_MINIMUM","Minimum liquidity","minimum_pct, maximum_pct, eligible_instruments, test_frequency"],
+  ["RESTRICTED_LIST","Client restricted list screen","list_source, update_frequency, match_basis"],
+  ["ESG_SCREEN","Revenue-threshold exclusionary screen","activity, revenue_threshold_pct, data_vendor, look_through"],
+  ["DERIVATIVES_USAGE","Derivatives usage limit","permitted_purposes, notional_cap_pct, leverage_permitted"],
+  ["COUNTERPARTY_LIMIT","Counterparty exposure limit","limit_pct, measure, minimum_counterparty_rating"],
+  ["TRACKING_ERROR_LIMIT","Tracking error limit","max_bps, benchmark, measurement_basis, window"],
+  ["CURRENCY_HEDGE","Currency hedging requirement","hedge_ratio_pct, tolerance_band, base_currency"]
+];
+
+const OWNERS = {
+  RESTRICTION: "Compliance — codes to the compliance engine",
+  FEE: "Billing — codes to the fee schedule",
+  REPORTING: "Client reporting — codes to the report package",
+  OPERATIONAL: "Middle office — account and settlement setup",
+  PERFORMANCE: "Performance — composite assignment",
+  BOILERPLATE: "No downstream action"
+};
+
+const state = { proposals: [], log: [], running: false };
+
+/* ---------- model adapter: keyless inside Claude, keyed from a clone ---------- */
+
+async function callModel(system, prompt, maxTokens) {
+  const headers = { "Content-Type": "application/json" };
+  const key = document.getElementById("key").value.trim();
+  if (key) {
+    headers["x-api-key"] = key;
+    headers["anthropic-version"] = "2023-06-01";
+    headers["anthropic-dangerous-direct-browser-access"] = "true";
+  }
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: maxTokens || 1000,
+      system,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) document.getElementById("keyrow").hidden = false;
+    throw new Error("The model call failed (" + res.status + "). If you are running this from a clone, add an API key below and try again.");
+  }
+  const data = await res.json();
+  return (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");
+}
+
+function parseJSON(raw) {
+  const cleaned = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+  const start = cleaned.search(/[{[]/);
+  return JSON.parse(start > 0 ? cleaned.slice(start) : cleaned);
+}
+
+/* ---------- stage 1: deterministic segmentation ---------- */
+
+function segment(text) {
+  const blocks = text.split(/\n\s*\n/).map(b => b.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean);
+  const numbered = [];
+  for (const b of blocks) {
+    const m = b.match(/^([A-Z]{0,2}\.?\d+(?:\.\d+)*)[.)\s]\s*([^.]{0,60}?)\.\s/);
+    if (m) numbered.push({ id: m[1], heading: m[2].trim(), text: b });
+  }
+  // A clause-numbered document is unambiguous, so trust the numbering and drop title blocks.
+  if (numbered.length >= 2) return numbered.slice(0, MAX_CLAUSES);
+  return blocks.filter(b => b.length > 120)
+    .map((b, i) => ({ id: "¶" + (i + 1), heading: "", text: b }))
+    .slice(0, MAX_CLAUSES);
+}
+
+/* ---------- stage 2-4: classify, match, score ---------- */
+
+const SYSTEM = `You are the extraction stage of a guideline intake pipeline at an institutional asset manager.
+You read one clause from an investment management agreement and either map it to a compliance rule archetype
+or route it to the team that owns it.
+
+Archetypes (id | label | parameters):
+${ARCHETYPES.map(a => a.join(" | ")).join("\n")}
+
+Rules of the job:
+- You never code anything. You produce a draft for a human reviewer.
+- Recall matters more than precision. A missed restriction is a risk event; a spurious one costs a reviewer
+  a few seconds. When a clause might be a restriction, treat it as one and flag your doubt.
+- Flag every genuine ambiguity in "ambiguities": unnamed data vendors, unstated measurement basis, undefined
+  cross-references, carve-backs by exception, anything defined only in an appendix you cannot see.
+- Read carefully for double negatives and for permissions embedded inside prohibitions.
+
+Respond with a single JSON object and nothing else. No markdown fences, no preamble.
+{
+ "classification": "RESTRICTION" | "FEE" | "REPORTING" | "OPERATIONAL" | "PERFORMANCE" | "BOILERPLATE",
+ "archetype_id": string or null,
+ "archetype_label": string or null,
+ "parameters": [{"name": string, "value": string}],
+ "exceptions": [string],
+ "confidence": number between 0 and 1,
+ "ambiguities": [string],
+ "rationale": one sentence, under 25 words,
+ "summary": for non-restriction clauses, one sentence naming the downstream action required
+}`;
+
+function tierOf(p) {
+  if (p.classification !== "RESTRICTION") return "other";
+  if ((p.ambiguities || []).length > 0 || p.confidence < 0.6) return "escalate";
+  if (p.confidence < 0.85) return "review";
+  return "auto";
+}
+
+const TIER_LABEL = {
+  auto: "Fast approve",
+  review: "Analyst review",
+  escalate: "Escalate to legal",
+  other: "Route to owner"
+};
+
+function markStep(i, cls) {
+  document.querySelectorAll("#steps li").forEach(li => {
+    if (+li.dataset.s === i) { li.classList.remove("on", "done"); if (cls) li.classList.add(cls); }
+  });
+}
+
+async function run() {
+  if (state.running) return;
+  const text = document.getElementById("doc").value.trim();
+  document.getElementById("errbox").innerHTML = "";
+  if (!text) { showError("Paste a mandate document or load one of the samples first."); return; }
+
+  state.running = true;
+  state.proposals = [];
+  const btn = document.getElementById("go");
+  btn.disabled = true;
+  btn.textContent = "Extracting…";
+  ["done","on"].forEach(c => document.querySelectorAll("#steps li").forEach(li => li.classList.remove(c)));
+
+  markStep(0, "on");
+  const clauses = segment(text);
+  markStep(0, "done");
+  if (!clauses.length) {
+    showError("No operative clauses found. Clauses should be separated by blank lines.");
+    reset(btn); return;
+  }
+
+  markStep(1, "on"); markStep(2, "on"); markStep(3, "on");
+  render();
+
+  try {
+    for (let i = 0; i < clauses.length; i += 3) {
+      const batch = clauses.slice(i, i + 3);
+      const results = await Promise.all(batch.map(async c => {
+        try {
+          const raw = await callModel(SYSTEM, "Clause " + c.id + ":\n\n" + c.text, 900);
+          return { clause: c, ...parseJSON(raw), status: null, edited: false };
+        } catch (e) {
+          return { clause: c, classification: "RESTRICTION", archetype_id: null,
+                   archetype_label: "Extraction failed", parameters: [], exceptions: [],
+                   confidence: 0, ambiguities: [e.message], rationale: "", status: null, edited: false };
+        }
+      }));
+      state.proposals.push(...results);
+      render();
+    }
+    [1,2,3].forEach(s => markStep(s, "done"));
+  } catch (e) {
+    showError(e.message);
+  }
+  reset(btn);
+}
+
+function reset(btn) {
+  state.running = false;
+  btn.disabled = false;
+  btn.textContent = "Extract rules";
+  render();
+}
+
+function showError(msg) {
+  document.getElementById("errbox").innerHTML = '<div class="err">' + esc(msg) + "</div>";
+}
+
+/* ---------- render ---------- */
+
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+function render() {
+  const q = document.getElementById("queue");
+  if (!state.proposals.length) {
+    q.innerHTML = state.running
+      ? '<div class="empty"><h3>Working through the document</h3><p>Each clause is classified, matched to an archetype and scored independently.</p></div>'
+      : '<div class="empty"><h3>Nothing in the queue</h3><p>Load a mandate on the left and extract. Restriction clauses arrive here as draft rules with the source language beside them. Everything else is routed to the team that owns it.</p></div>';
+  } else {
+    q.innerHTML = state.proposals.map(card).join("");
+  }
+
+  document.getElementById("c-prop").textContent = state.proposals.length;
+  document.getElementById("c-appr").textContent = state.proposals.filter(p => p.status === "approved").length;
+  document.getElementById("c-edit").textContent = state.proposals.filter(p => p.edited).length;
+  document.getElementById("c-rej").textContent = state.proposals.filter(p => p.status === "rejected").length;
+
+  const log = document.getElementById("log");
+  log.innerHTML = state.log.length
+    ? state.log.map(r => "<tr><td class='m'>" + esc(r.id) + "</td><td>" + esc(r.rule) +
+        "</td><td>" + esc(r.decision) + "</td><td class='m'>" + r.conf +
+        "</td><td class='m'>" + esc(r.time) + "</td></tr>").join("")
+    : '<tr><td colspan="5" style="color:var(--slate-soft)">No decisions yet.</td></tr>';
+}
+
+function card(p, i) {
+  const idx = state.proposals.indexOf(p);
+  const tier = tierOf(p);
+  const isRule = p.classification === "RESTRICTION";
+  const title = isRule ? (p.archetype_label || "Unmatched restriction")
+                       : (OWNERS[p.classification] || p.classification);
+
+  const params = (p.parameters || []).map((x, j) => "<tr><th>" + esc(x.name) + "</th><td>" +
+    (p.editing ? '<input data-p="' + idx + '" data-j="' + j + '" value="' + esc(x.value) + '">' : esc(x.value)) +
+    "</td></tr>").join("");
+
+  const flags = (p.ambiguities || []).length
+    ? "<ul class='flags'>" + p.ambiguities.map(a => "<li>" + esc(a) + "</li>").join("") + "</ul>" : "";
+
+  const exceptions = (p.exceptions || []).length
+    ? "<p class='precedent'>Carve-outs: " + p.exceptions.map(esc).join("; ") + "</p>" : "";
+
+  const foot = p.status
+    ? "<div class='verdict' style='color:" + (p.status === "approved" ? "var(--approve)" : "var(--escalate)") + "'>" +
+      (p.status === "approved" ? (p.edited ? "Approved with edits and coded." : "Approved and coded.")
+                               : "Rejected. Returned for manual authoring.") + "</div>"
+    : "<div class='actions'>" +
+      "<button class='ok' onclick='decide(" + idx + ",\"approved\")'>Approve and code</button>" +
+      "<button class='ed' onclick='toggleEdit(" + idx + ")'>" + (p.editing ? "Save edits" : "Edit parameters") + "</button>" +
+      "<button class='no' onclick='decide(" + idx + ",\"rejected\")'>Reject</button>" +
+      "</div>";
+
+  return "<article class='proposal" + (p.status ? " settled" : "") + "'>" +
+    "<div class='phead'><span class='cid'>" + esc(p.clause.id) + "</span>" +
+      "<span class='title'>" + esc(title) + "</span><span class='spacer'></span>" +
+      (isRule ? "<span class='conf'>" + Math.round((p.confidence || 0) * 100) + "% confidence</span>" : "") +
+      "<span class='chip " + tier + "'>" + TIER_LABEL[tier] + "</span></div>" +
+    "<div class='pbody'>" +
+      "<div class='clause'><span class='cite'>Source — clause " + esc(p.clause.id) +
+        (p.clause.heading ? ", " + esc(p.clause.heading) : "") + "</span>" + esc(p.clause.text) + "</div>" +
+      "<div class='rulepanel'>" +
+        (isRule
+          ? (params ? "<table class='params'>" + params + "</table>" : "<p class='rationale'>No parameters extracted.</p>")
+          : "<p class='rationale'>" + esc(p.summary || "") + "</p>") +
+        (p.rationale ? "<p class='rationale'>" + esc(p.rationale) + "</p>" : "") +
+        exceptions + flags +
+      "</div>" +
+    "</div>" + foot + "</article>";
+}
+
+/* ---------- decisions ---------- */
+
+window.toggleEdit = function (i) {
+  const p = state.proposals[i];
+  if (p.editing) {
+    document.querySelectorAll('input[data-p="' + i + '"]').forEach(inp => {
+      const j = +inp.dataset.j;
+      if (p.parameters[j].value !== inp.value) p.edited = true;
+      p.parameters[j].value = inp.value;
+    });
+  }
+  p.editing = !p.editing;
+  render();
+};
+
+window.decide = function (i, status) {
+  const p = state.proposals[i];
+  if (p.editing) window.toggleEdit(i);
+  p.status = status;
+  state.log.unshift({
+    id: p.clause.id,
+    rule: p.archetype_label || OWNERS[p.classification] || p.classification,
+    decision: status === "approved" ? (p.edited ? "Approved with edits" : "Approved") : "Rejected",
+    conf: Math.round((p.confidence || 0) * 100) + "%",
+    time: new Date().toLocaleTimeString()
+  });
+  render();
+};
+
+/* ---------- boot ---------- */
+
+document.getElementById("samples").innerHTML = SAMPLES.map(s =>
+  "<button onclick='loadSample(\"" + s.id + "\")'><b>" + esc(s.name) + "</b><span>" + esc(s.note) + "</span></button>"
+).join("");
+
+window.loadSample = function (id) {
+  document.getElementById("doc").value = SAMPLE_TEXT[id];
+  document.getElementById("errbox").innerHTML = "";
+};
+
+document.getElementById("go").addEventListener("click", run);
+render();
+</script>

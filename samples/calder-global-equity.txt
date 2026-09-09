@@ -1,0 +1,35 @@
+INVESTMENT GUIDELINES — EXHIBIT A
+The Calder Foundation
+Mandate: Global Equity, screened (separate account)
+Benchmark: MSCI ACWI
+
+A.1 Sector Exposure. Exposure to any single GICS sector shall not exceed the
+weight of that sector in the Benchmark by more than seven hundred fifty (750)
+basis points.
+
+A.2 Emerging Markets. Not more than fifteen percent (15%) of the market value of
+the Account may be invested in issuers domiciled in countries classified as
+emerging markets by the Benchmark provider.
+
+A.3 Exclusionary Screens. The Account shall exclude issuers deriving more than
+five percent (5%) of revenue from thermal coal extraction, and issuers deriving
+any revenue from the manufacture of controversial weapons. Screening shall be
+applied at the issuer level.
+
+A.4 Tracking Error. The Manager shall manage the Account with a view to
+maintaining tracking error against the Benchmark of no more than four hundred
+(400) basis points.
+
+A.5 Cash. The Account shall hold not less than one percent (1%) and not more than
+five percent (5%) of market value in cash and cash equivalents, tested at month
+end.
+
+A.6 Currency. The Manager shall not hedge currency exposure except as otherwise
+agreed in writing between the parties.
+
+A.7 Management Fee. Forty (40) basis points per annum on average daily market
+value, billed quarterly in arrears, subject to an annual minimum fee of $150,000.
+
+A.8 Reporting. The Manager shall provide a quarterly report including holdings,
+performance against the Benchmark, and a summary of screening exceptions
+identified during the period.

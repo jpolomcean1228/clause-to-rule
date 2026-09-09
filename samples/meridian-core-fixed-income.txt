@@ -1,0 +1,46 @@
+INVESTMENT MANAGEMENT AGREEMENT — SCHEDULE B
+Meridian Public Employees' Retirement System
+Mandate: Core Fixed Income (separate account)
+Benchmark: Bloomberg US Aggregate Bond Index
+
+B.1 Concentration. No more than five percent (5%) of the market value of the
+Account shall be invested in the securities of any single issuer, provided that
+this limitation shall not apply to obligations issued or guaranteed by the United
+States government or its agencies, or to cash and cash equivalents.
+
+B.2 Credit Quality. Securities purchased for the Account shall carry a minimum
+rating of Baa3 by Moody's or BBB- by Standard & Poor's at the time of purchase.
+Where the two agencies assign split ratings, the lower shall govern. Securities
+downgraded below the minimum after purchase need not be sold immediately, but
+shall be disposed of within ninety (90) days unless the Client agrees otherwise in
+writing.
+
+B.3 Duration. The effective duration of the Account shall be maintained within
+plus or minus one (1) year of the effective duration of the Benchmark.
+
+B.4 Prohibited Instruments. The Manager shall not invest the Account in private
+placements, commodities, or direct real estate. The Manager is not prohibited from
+using interest rate futures and interest rate swaps solely for the purpose of
+managing portfolio duration, and shall not employ such instruments to create
+economic leverage.
+
+B.5 Restricted Securities. The Manager shall not purchase any security appearing
+on the Client's restricted securities list, as delivered to the Manager and
+updated from time to time in accordance with Appendix IV.
+
+B.6 Management Fee. The Manager shall be paid a fee, billed quarterly in arrears,
+of 22 basis points per annum on the first $100 million of average daily market
+value and 18 basis points per annum on amounts above that level.
+
+B.7 Reporting. The Manager shall deliver a monthly performance and holdings
+report within ten (10) business days of month end, and a quarterly attribution
+report including duration and sector positioning against the Benchmark within
+twenty (20) business days of quarter end.
+
+B.8 Custody. Assets of the Account shall be held by Northern Trust Company as
+custodian. The Manager shall transmit trade instructions to the custodian by
+11:00 a.m. Eastern on trade date plus one.
+
+B.9 Governing Law. This Agreement shall be governed by and construed in
+accordance with the laws of the State of Illinois, without regard to its conflict
+of laws principles.
