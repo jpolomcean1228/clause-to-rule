@@ -75,6 +75,42 @@ click.
 These are the dependency notifications that onboarding usually chases by email. They fall out of the same pass
 that drafts the compliance rules, because the classifier has already decided who owns each clause.
 
+## Multi-document conflicts
+
+```bash
+node conflicts/detect.mjs conflicts/examples/meridian-ima.json conflicts/examples/meridian-side-letter.json
+node conflicts/detect.mjs conflicts/examples/calder-ima.json conflicts/examples/calder-amendment.json
+node conflicts/detect.mjs conflicts/examples/meridian-ima.json conflicts/examples/meridian-side-letter.json conflicts/examples/meridian-side-letter-b.json
+```
+
+No API key. A mandate is rarely one document — there is a base IMA, amendments, and side letters, and a side
+letter routinely overrides the agreement it sits under. Coding only the last document read, or only the base
+agreement, is how an account trades against the wrong constraint.
+
+The report is built around one distinction: **a later document that tightens a restriction is bookkeeping. One
+that loosens it is a risk decision, and nobody should get to make it silently.** Findings sort into what needs
+a human and what does not.
+
+Direction is judged from `pattern-library.json`, which now carries tightening semantics per parameter — whether
+a lower or higher value is more restrictive — plus a rating scale so `Baa3` and `A-` can be compared across
+agencies. Where the library has no semantics for a parameter, the report says the direction is undeterminable
+rather than guessing. A parameter with no direction, like a change of rating agency, does not outvote the ones
+that plainly moved.
+
+Four cases worth seeing:
+
+- **Loosened** — the Meridian side letter raises the issuer cap from 5% to 7%. Flagged for sign-off
+- **Carve-back resolved** — the Calder IMA prohibits currency hedging "except as otherwise agreed in writing",
+  and the amendment is that writing. An open ambiguity in the base document closes because a second document
+  supplied the terms
+- **Unresolved** — two side letters of equal precedence, same effective date, disagreeing on the same limit.
+  Precedence cannot settle it, so the report refuses to pick and says so
+- **Restated identically** — the same rule coded twice across documents. No action, but worth knowing
+
+Precedence comes from document metadata, not from the order files are passed on the command line. In a real
+deployment that ranking is asserted by the documents themselves, and getting it wrong is its own risk — which
+is why the report prints the ranking it used before it prints any findings.
+
 ## Mandate composition — how much of this is actually bespoke
 
 ```bash

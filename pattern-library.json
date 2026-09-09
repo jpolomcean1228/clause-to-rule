@@ -2,125 +2,351 @@
   "version": "0.1.0",
   "note": "Restriction archetypes. The client-specific part of a guideline is the parameter, not the logic. New mandates are coded as parameterized instances of these patterns rather than authored from scratch. In a production build this catalog would be derived empirically by mining rules already coded in the compliance engine, not hand-written.",
   "classifications": [
-    { "id": "RESTRICTION", "label": "Investment restriction", "owner": "Compliance", "codes_to": "Compliance engine" },
-    { "id": "FEE", "label": "Fee term", "owner": "Billing", "codes_to": "Fee schedule" },
-    { "id": "REPORTING", "label": "Reporting obligation", "owner": "Client reporting", "codes_to": "Report package" },
-    { "id": "OPERATIONAL", "label": "Operational term", "owner": "Middle office", "codes_to": "Account setup" },
-    { "id": "PERFORMANCE", "label": "Performance term", "owner": "Performance", "codes_to": "Composite assignment" },
-    { "id": "BOILERPLATE", "label": "Legal boilerplate", "owner": "None", "codes_to": "No downstream action" }
+    {
+      "id": "RESTRICTION",
+      "label": "Investment restriction",
+      "owner": "Compliance",
+      "codes_to": "Compliance engine"
+    },
+    {
+      "id": "FEE",
+      "label": "Fee term",
+      "owner": "Billing",
+      "codes_to": "Fee schedule"
+    },
+    {
+      "id": "REPORTING",
+      "label": "Reporting obligation",
+      "owner": "Client reporting",
+      "codes_to": "Report package"
+    },
+    {
+      "id": "OPERATIONAL",
+      "label": "Operational term",
+      "owner": "Middle office",
+      "codes_to": "Account setup"
+    },
+    {
+      "id": "PERFORMANCE",
+      "label": "Performance term",
+      "owner": "Performance",
+      "codes_to": "Composite assignment"
+    },
+    {
+      "id": "BOILERPLATE",
+      "label": "Legal boilerplate",
+      "owner": "None",
+      "codes_to": "No downstream action"
+    }
   ],
   "archetypes": [
     {
       "id": "ISSUER_CONCENTRATION",
       "label": "Issuer concentration limit",
-      "parameters": ["limit_pct", "basis", "scope", "aggregation"],
-      "bases": ["market_value", "notional", "commitment"],
-      "common_exceptions": ["US Treasury and agency obligations", "cash and equivalents", "registered funds"],
-      "notes": "Watch for look-through language on funds and for aggregation across affiliated issuers."
+      "parameters": [
+        "limit_pct",
+        "basis",
+        "scope",
+        "aggregation"
+      ],
+      "bases": [
+        "market_value",
+        "notional",
+        "commitment"
+      ],
+      "common_exceptions": [
+        "US Treasury and agency obligations",
+        "cash and equivalents",
+        "registered funds"
+      ],
+      "notes": "Watch for look-through language on funds and for aggregation across affiliated issuers.",
+      "tightening": {
+        "limit_pct": "lower"
+      }
     },
     {
       "id": "SECTOR_LIMIT",
       "label": "Sector exposure limit",
-      "parameters": ["limit_pct", "sector_scheme", "sector", "relative_to"],
-      "bases": ["market_value"],
+      "parameters": [
+        "limit_pct",
+        "sector_scheme",
+        "sector",
+        "relative_to"
+      ],
+      "bases": [
+        "market_value"
+      ],
       "common_exceptions": [],
-      "notes": "Frequently expressed relative to benchmark weight rather than absolute."
+      "notes": "Frequently expressed relative to benchmark weight rather than absolute.",
+      "tightening": {
+        "limit_pct": "lower"
+      }
     },
     {
       "id": "GEOGRAPHIC_LIMIT",
       "label": "Country or region exposure limit",
-      "parameters": ["limit_pct", "region", "classification_source"],
-      "bases": ["market_value"],
+      "parameters": [
+        "limit_pct",
+        "region",
+        "classification_source"
+      ],
+      "bases": [
+        "market_value"
+      ],
       "common_exceptions": [],
-      "notes": "Confirm whether classification follows domicile, risk country, or index provider."
+      "notes": "Confirm whether classification follows domicile, risk country, or index provider.",
+      "tightening": {
+        "limit_pct": "lower"
+      }
     },
     {
       "id": "CREDIT_RATING_FLOOR",
       "label": "Minimum credit quality",
-      "parameters": ["minimum_rating", "agency", "multi_agency_rule", "test_point"],
-      "bases": ["per_security", "portfolio_average"],
-      "common_exceptions": ["downgrade cure periods"],
-      "notes": "Test point matters enormously. At purchase and ongoing are different rules with different breach profiles."
+      "parameters": [
+        "minimum_rating",
+        "agency",
+        "multi_agency_rule",
+        "test_point"
+      ],
+      "bases": [
+        "per_security",
+        "portfolio_average"
+      ],
+      "common_exceptions": [
+        "downgrade cure periods"
+      ],
+      "notes": "Test point matters enormously. At purchase and ongoing are different rules with different breach profiles.",
+      "tightening": {
+        "minimum_rating": "higher",
+        "cure_period": "lower"
+      }
     },
     {
       "id": "DURATION_BAND",
       "label": "Portfolio duration band",
-      "parameters": ["min", "max", "relative_to", "measure"],
-      "bases": ["effective_duration", "modified_duration"],
+      "parameters": [
+        "min",
+        "max",
+        "relative_to",
+        "measure"
+      ],
+      "bases": [
+        "effective_duration",
+        "modified_duration"
+      ],
       "common_exceptions": [],
-      "notes": "Often stated as benchmark plus or minus a band rather than absolute."
+      "notes": "Often stated as benchmark plus or minus a band rather than absolute.",
+      "tightening": {
+        "max": "lower",
+        "min": "higher"
+      }
     },
     {
       "id": "MATURITY_LIMIT",
       "label": "Maximum maturity",
-      "parameters": ["max_years", "measure", "scope"],
-      "bases": ["final_maturity", "weighted_average_life"],
+      "parameters": [
+        "max_years",
+        "measure",
+        "scope"
+      ],
+      "bases": [
+        "final_maturity",
+        "weighted_average_life"
+      ],
       "common_exceptions": [],
-      "notes": ""
+      "notes": "",
+      "tightening": {
+        "max_years": "lower"
+      }
     },
     {
       "id": "PROHIBITED_INSTRUMENT",
       "label": "Prohibited instrument or asset class",
-      "parameters": ["instrument_classes", "permitted_purposes"],
-      "bases": ["binary"],
-      "common_exceptions": ["hedging", "efficient portfolio management"],
-      "notes": "Prohibitions carved back by permitted purpose are a frequent source of ambiguity."
+      "parameters": [
+        "instrument_classes",
+        "permitted_purposes"
+      ],
+      "bases": [
+        "binary"
+      ],
+      "common_exceptions": [
+        "hedging",
+        "efficient portfolio management"
+      ],
+      "notes": "Prohibitions carved back by permitted purpose are a frequent source of ambiguity.",
+      "tightening": {}
     },
     {
       "id": "LIQUIDITY_MINIMUM",
       "label": "Minimum liquidity",
-      "parameters": ["minimum_pct", "eligible_instruments", "test_frequency"],
-      "bases": ["market_value"],
+      "parameters": [
+        "minimum_pct",
+        "eligible_instruments",
+        "test_frequency"
+      ],
+      "bases": [
+        "market_value"
+      ],
       "common_exceptions": [],
-      "notes": ""
+      "notes": "",
+      "tightening": {
+        "minimum_pct": "higher",
+        "maximum_pct": "lower"
+      }
     },
     {
       "id": "RESTRICTED_LIST",
       "label": "Client restricted list screen",
-      "parameters": ["list_source", "update_frequency", "match_basis"],
-      "bases": ["binary"],
+      "parameters": [
+        "list_source",
+        "update_frequency",
+        "match_basis"
+      ],
+      "bases": [
+        "binary"
+      ],
       "common_exceptions": [],
-      "notes": "Almost always references an external appendix. The rule is codeable; the list is an ongoing data feed and a separate operational dependency."
+      "notes": "Almost always references an external appendix. The rule is codeable; the list is an ongoing data feed and a separate operational dependency.",
+      "tightening": {}
     },
     {
       "id": "ESG_SCREEN",
       "label": "Revenue-threshold exclusionary screen",
-      "parameters": ["activity", "revenue_threshold_pct", "data_vendor", "look_through"],
-      "bases": ["issuer_revenue"],
-      "common_exceptions": ["passive index exposure"],
-      "notes": "Unusable without a named data vendor. If the clause omits one, escalate rather than guess."
+      "parameters": [
+        "activity",
+        "revenue_threshold_pct",
+        "data_vendor",
+        "look_through"
+      ],
+      "bases": [
+        "issuer_revenue"
+      ],
+      "common_exceptions": [
+        "passive index exposure"
+      ],
+      "notes": "Unusable without a named data vendor. If the clause omits one, escalate rather than guess.",
+      "tightening": {
+        "revenue_threshold_pct": "lower"
+      }
     },
     {
       "id": "DERIVATIVES_USAGE",
       "label": "Derivatives usage limit",
-      "parameters": ["permitted_purposes", "notional_cap_pct", "leverage_permitted"],
-      "bases": ["notional", "market_value"],
+      "parameters": [
+        "permitted_purposes",
+        "notional_cap_pct",
+        "leverage_permitted"
+      ],
+      "bases": [
+        "notional",
+        "market_value"
+      ],
       "common_exceptions": [],
-      "notes": ""
+      "notes": "",
+      "tightening": {
+        "notional_cap_pct": "lower"
+      }
     },
     {
       "id": "COUNTERPARTY_LIMIT",
       "label": "Counterparty exposure limit",
-      "parameters": ["limit_pct", "measure", "minimum_counterparty_rating"],
-      "bases": ["net_exposure", "notional"],
-      "common_exceptions": ["centrally cleared transactions"],
-      "notes": ""
+      "parameters": [
+        "limit_pct",
+        "measure",
+        "minimum_counterparty_rating"
+      ],
+      "bases": [
+        "net_exposure",
+        "notional"
+      ],
+      "common_exceptions": [
+        "centrally cleared transactions"
+      ],
+      "notes": "",
+      "tightening": {
+        "limit_pct": "lower",
+        "minimum_counterparty_rating": "higher"
+      }
     },
     {
       "id": "TRACKING_ERROR_LIMIT",
       "label": "Tracking error limit",
-      "parameters": ["max_bps", "benchmark", "measurement_window"],
-      "bases": ["ex_ante", "ex_post"],
+      "parameters": [
+        "max_bps",
+        "benchmark",
+        "measurement_window"
+      ],
+      "bases": [
+        "ex_ante",
+        "ex_post"
+      ],
       "common_exceptions": [],
-      "notes": "Ex ante and ex post are not interchangeable. If unstated, escalate."
+      "notes": "Ex ante and ex post are not interchangeable. If unstated, escalate.",
+      "tightening": {
+        "max_bps": "lower"
+      }
     },
     {
       "id": "CURRENCY_HEDGE",
       "label": "Currency hedging requirement",
-      "parameters": ["hedge_ratio_pct", "tolerance_band", "base_currency"],
-      "bases": ["market_value"],
+      "parameters": [
+        "hedge_ratio_pct",
+        "tolerance_band",
+        "base_currency"
+      ],
+      "bases": [
+        "market_value"
+      ],
       "common_exceptions": [],
-      "notes": ""
+      "notes": "",
+      "tightening": {}
     }
-  ]
+  ],
+  "tightening_note": "Which direction of change makes a rule more restrictive. Required to tell a side letter that tightens a limit (low risk, note it) from one that loosens it (a risk decision needing sign-off). 'lower' means a smaller value is tighter; 'higher' means a larger value is tighter.",
+  "rating_scale": [
+    "AAA",
+    "AA+",
+    "AA",
+    "AA-",
+    "A+",
+    "A",
+    "A-",
+    "BBB+",
+    "BBB",
+    "BBB-",
+    "BB+",
+    "BB",
+    "BB-",
+    "B+",
+    "B",
+    "B-",
+    "CCC+",
+    "CCC",
+    "CCC-",
+    "CC",
+    "C",
+    "D"
+  ],
+  "rating_aliases": {
+    "Aaa": "AAA",
+    "Aa1": "AA+",
+    "Aa2": "AA",
+    "Aa3": "AA-",
+    "A1": "A+",
+    "A2": "A",
+    "A3": "A-",
+    "Baa1": "BBB+",
+    "Baa2": "BBB",
+    "Baa3": "BBB-",
+    "Ba1": "BB+",
+    "Ba2": "BB",
+    "Ba3": "BB-",
+    "B1": "B+",
+    "B2": "B",
+    "B3": "B-",
+    "Caa1": "CCC+",
+    "Caa2": "CCC",
+    "Caa3": "CCC-",
+    "Ca": "CC"
+  }
 }

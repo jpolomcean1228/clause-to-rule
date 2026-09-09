@@ -1,0 +1,122 @@
+{
+  "account": "Meridian Public Employees' Retirement System",
+  "document": {
+    "id": "SL-MERIDIAN-01",
+    "type": "SIDE_LETTER",
+    "effective_date": "2026-06-15",
+    "precedence": 2
+  },
+  "note": "Side letter executed after funding. Precedence 2 \u2014 governs where it conflicts with the IMA.",
+  "clauses": [
+    {
+      "clause": {
+        "id": "SL.1",
+        "text": "Notwithstanding Section B.1 of the Agreement, the issuer concentration limit shall be seven percent (7%) of the market value of the Account."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "ISSUER_CONCENTRATION",
+      "parameters": [
+        {
+          "name": "limit_pct",
+          "value": "7"
+        },
+        {
+          "name": "basis",
+          "value": "market value"
+        },
+        {
+          "name": "scope",
+          "value": "per issuer"
+        }
+      ],
+      "exceptions": [
+        "US government and agency obligations"
+      ],
+      "confidence": 0.93,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "SL.2",
+        "text": "The minimum rating requirement in Section B.2 is amended to A- by Standard & Poor's at the time of purchase, with a cure period of sixty (60) days."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "CREDIT_RATING_FLOOR",
+      "parameters": [
+        {
+          "name": "minimum_rating",
+          "value": "A-"
+        },
+        {
+          "name": "agency",
+          "value": "S&P"
+        },
+        {
+          "name": "multi_agency_rule",
+          "value": "lower governs"
+        },
+        {
+          "name": "test_point",
+          "value": "at purchase"
+        },
+        {
+          "name": "cure_period",
+          "value": "60 days"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.92,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "SL.3",
+        "text": "The effective duration of the Account shall be maintained within plus or minus one (1) year of the effective duration of the Benchmark."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "DURATION_BAND",
+      "parameters": [
+        {
+          "name": "relative_to",
+          "value": "benchmark"
+        },
+        {
+          "name": "min",
+          "value": "-1"
+        },
+        {
+          "name": "max",
+          "value": "+1"
+        },
+        {
+          "name": "measure",
+          "value": "effective duration"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.95,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "SL.4",
+        "text": "No security shall be purchased with a final maturity greater than fifteen (15) years from the date of settlement."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "MATURITY_LIMIT",
+      "parameters": [
+        {
+          "name": "max_years",
+          "value": "15"
+        },
+        {
+          "name": "measure",
+          "value": "final maturity"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.94,
+      "ambiguities": []
+    }
+  ]
+}

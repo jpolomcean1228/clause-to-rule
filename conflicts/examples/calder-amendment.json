@@ -1,0 +1,66 @@
+{
+  "account": "The Calder Foundation",
+  "document": {
+    "id": "AMD-CALDER-01",
+    "type": "AMENDMENT",
+    "effective_date": "2026-05-20",
+    "precedence": 2
+  },
+  "note": "Amendment supplying the written agreement the base IMA left open on currency hedging.",
+  "clauses": [
+    {
+      "clause": {
+        "id": "AM.1",
+        "text": "The parties agree that the Manager may hedge non-base currency exposure up to one hundred percent (100%) of market value, with a tolerance band of plus or minus three percent (3%)."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "CURRENCY_HEDGE",
+      "parameters": [
+        {
+          "name": "hedge_ratio_pct",
+          "value": "100"
+        },
+        {
+          "name": "tolerance_band",
+          "value": "+/- 3"
+        },
+        {
+          "name": "base_currency",
+          "value": "USD"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.95,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "AM.2",
+        "text": "Ex ante tracking error against the Benchmark, measured monthly, shall not exceed three hundred (300) basis points."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "TRACKING_ERROR_LIMIT",
+      "parameters": [
+        {
+          "name": "max_bps",
+          "value": "300"
+        },
+        {
+          "name": "benchmark",
+          "value": "MSCI ACWI"
+        },
+        {
+          "name": "measurement_basis",
+          "value": "ex ante"
+        },
+        {
+          "name": "window",
+          "value": "monthly"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.96,
+      "ambiguities": []
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "account": "The Calder Foundation",
+  "note": "Extraction output for samples/calder-global-equity.txt. Triggers conditional requirements Meridian does not: an ESG data vendor and a tracking error measurement basis.",
+  "clauses": [
+    {
+      "clause": {
+        "id": "A.1",
+        "text": "Exposure to any single GICS sector shall not exceed the weight of that sector in the Benchmark by more than seven hundred fifty (750) basis points."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "SECTOR_LIMIT",
+      "parameters": [
+        {
+          "name": "limit_pct",
+          "value": "750 bps over benchmark"
+        },
+        {
+          "name": "sector_scheme",
+          "value": "GICS"
+        },
+        {
+          "name": "relative_to",
+          "value": "benchmark weight"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.93,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "A.2",
+        "text": "Not more than fifteen percent (15%) of the market value of the Account may be invested in issuers domiciled in countries classified as emerging markets by the Benchmark provider."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "GEOGRAPHIC_LIMIT",
+      "parameters": [
+        {
+          "name": "limit_pct",
+          "value": "15"
+        },
+        {
+          "name": "region",
+          "value": "emerging markets"
+        },
+        {
+          "name": "classification_source",
+          "value": "benchmark provider"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.9,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "A.3",
+        "text": "The Account shall exclude issuers deriving more than five percent (5%) of revenue from thermal coal extraction, and issuers deriving any revenue from the manufacture of controversial weapons. Screening shall be applied at the issuer level."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "ESG_SCREEN",
+      "parameters": [
+        {
+          "name": "activity",
+          "value": "thermal coal extraction; controversial weapons"
+        },
+        {
+          "name": "revenue_threshold_pct",
+          "value": "5 (coal); 0 (weapons)"
+        },
+        {
+          "name": "look_through",
+          "value": "issuer level"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.71,
+      "ambiguities": [
+        "No ESG data vendor named; revenue classification differs materially between providers"
+      ]
+    },
+    {
+      "clause": {
+        "id": "A.4",
+        "text": "The Manager shall manage the Account with a view to maintaining tracking error against the Benchmark of no more than four hundred (400) basis points."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "TRACKING_ERROR_LIMIT",
+      "parameters": [
+        {
+          "name": "max_bps",
+          "value": "400"
+        },
+        {
+          "name": "benchmark",
+          "value": "MSCI ACWI"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.58,
+      "ambiguities": [
+        "Measurement basis unstated (ex ante vs ex post)",
+        "'with a view to' may indicate a target rather than a hard limit"
+      ]
+    },
+    {
+      "clause": {
+        "id": "A.5",
+        "text": "The Account shall hold not less than one percent (1%) and not more than five percent (5%) of market value in cash and cash equivalents, tested at month end."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "LIQUIDITY_MINIMUM",
+      "parameters": [
+        {
+          "name": "minimum_pct",
+          "value": "1"
+        },
+        {
+          "name": "maximum_pct",
+          "value": "5"
+        },
+        {
+          "name": "test_frequency",
+          "value": "month end"
+        }
+      ],
+      "exceptions": [],
+      "confidence": 0.94,
+      "ambiguities": []
+    },
+    {
+      "clause": {
+        "id": "A.6",
+        "text": "The Manager shall not hedge currency exposure except as otherwise agreed in writing between the parties."
+      },
+      "classification": "RESTRICTION",
+      "archetype_id": "CURRENCY_HEDGE",
+      "parameters": [
+        {
+          "name": "hedge_ratio_pct",
+          "value": "0"
+        }
+      ],
+      "exceptions": [
+        "as otherwise agreed in writing"
+      ],
+      "confidence": 0.66,
+      "ambiguities": [
+        "Open-ended carve-back; any side letter modifying this is not visible in the document"
+      ]
+    },
+    {
+      "clause": {
+        "id": "A.7",
+        "text": "Forty (40) basis points per annum on average daily market value, billed quarterly in arrears, subject to an annual minimum fee of $150,000."
+      },
+      "classification": "FEE",
+      "archetype_id": null,
+      "parameters": [],
+      "exceptions": [],
+      "confidence": 0.96,
+      "ambiguities": [],
+      "summary": "40bps on ADMV, quarterly in arrears, $150k annual minimum. Billing to configure the minimum-fee true-up."
+    },
+    {
+      "clause": {
+        "id": "A.8",
+        "text": "The Manager shall provide a quarterly report including holdings, performance against the Benchmark, and a summary of screening exceptions identified during the period."
+      },
+      "classification": "REPORTING",
+      "archetype_id": null,
+      "parameters": [],
+      "exceptions": [],
+      "confidence": 0.94,
+      "ambiguities": [],
+      "summary": "Quarterly holdings, benchmark-relative performance, and a screening exceptions summary. The exceptions section is non-standard and needs a report build."
+    }
+  ],
+  "document": {
+    "id": "IMA-CALDER-2026",
+    "type": "IMA",
+    "effective_date": "2026-02-10",
+    "precedence": 1
+  }
+}

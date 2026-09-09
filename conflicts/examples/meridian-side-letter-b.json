@@ -1,0 +1,20 @@
+{
+  "account": "Meridian Public Employees' Retirement System",
+  "document": { "id": "SL-MERIDIAN-02", "type": "SIDE_LETTER", "effective_date": "2026-06-15", "precedence": 2 },
+  "note": "Second side letter, same effective date and same precedence as SL-MERIDIAN-01. Included to exercise the case document precedence cannot settle — two instruments of equal rank disagreeing on the same rule.",
+  "clauses": [
+    {
+      "clause": { "id": "SLB.1", "text": "The issuer concentration limit applicable to the Account shall be six percent (6%) of market value." },
+      "classification": "RESTRICTION",
+      "archetype_id": "ISSUER_CONCENTRATION",
+      "parameters": [
+        { "name": "limit_pct", "value": "6" },
+        { "name": "basis", "value": "market value" },
+        { "name": "scope", "value": "per issuer" }
+      ],
+      "exceptions": [],
+      "confidence": 0.92,
+      "ambiguities": []
+    }
+  ]
+}
