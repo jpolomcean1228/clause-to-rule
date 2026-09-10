@@ -39,13 +39,44 @@ taxonomy and a lower-risk first project than shipping an extraction model.
 | 3. Match and extract | Model | Maps the clause to an archetype and fills parameters against a fixed schema. Structured output, not prose |
 | 4. Score and tier | Deterministic, over model output | Confidence plus flagged ambiguities decide the review path |
 
-Routing thresholds live in `tierOf()`:
+### Routing does not trust the model's confidence
 
-- **Fast approve** — high confidence, clean match to an established archetype, no flagged ambiguity
-- **Analyst review** — matched but uncertain
-- **Escalate to legal** — low confidence, or any flagged ambiguity: an unnamed data vendor, an unstated
-  measurement basis, a cross-reference to an appendix the model cannot see, a prohibition carved back by
-  exception
+The obvious way to tier proposals is on the confidence the model reports about itself. That is also the one
+number in the whole pipeline you have least reason to believe — a self-report about reliability is exactly the
+claim to be suspicious of, and LLM confidence is frequently miscalibrated.
+
+So routing blends four signals, and the model's own confidence is the smallest weight:
+
+| Signal | Weight | How it is checked |
+|---|---|---|
+| Parameter completeness | 0.30 | Did the extraction fill the parameters its archetype expects? Deterministic, against the archetype definition |
+| Precedent agreement | 0.25 | Did it drop a parameter a prior coded account carries? Computed from the precedent corpus |
+| Clause clarity | 0.30 | Regex over the source text: appendix references, carve-backs, double negatives, hedged obligations, several thresholds in one clause |
+| Model self-report | 0.15 | What the model said about itself |
+
+**85% of the routing decision rests on evidence independent of the model.** Where no precedent exists, that
+weight is redistributed rather than scored as a failure — absence of precedent is not evidence of error.
+
+Two kinds of trigger, deliberately not collapsed. **Hard** reasons mean nobody can code the clause correctly
+yet — a flagged ambiguity, a reference to a document nobody has, a carve-back by separate agreement. Those
+escalate. **Soft** reasons mean something deserves a second pair of eyes — a dropped parameter, an
+under-filled archetype. Those cap the tier at review. Collapsing them would flood the escalation queue and
+train people to ignore it.
+
+```bash
+node routing/audit.mjs readiness/examples/calder-extracted.json
+node routing/audit.mjs readiness/examples/meridian-extracted.json --verbose
+```
+
+No API key. The audit runs the console's own routing code — parsed out of `index.html` between the ROUTING
+markers, not duplicated — and compares it against what routing on model confidence alone would have done.
+
+On the Calder mandate it holds back a clause the model was 94% confident about, because precedent shows a
+parameter it dropped. On Meridian it independently catches the double negative in B.4 and the appendix
+reference in B.5 from the text itself, without needing the model to have noticed either.
+
+The audit does not prove the model's confidence is calibrated. It shows routing would still function if it
+were not. Calibration is measured by `eval/run.mjs`, which needs an API key. This does not.
 
 Tiering is what makes this a throughput tool rather than an autonomy claim. The queue is triaged, not
 eliminated.

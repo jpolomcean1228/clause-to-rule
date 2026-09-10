@@ -292,6 +292,19 @@
   .diff-row.missing .k { color: var(--escalate); }
   .nomatch { font-size: 12.5px; color: var(--slate-soft); }
 
+  .signals { border-top: 1px solid #eef0f3; margin-top: 10px; padding-top: 10px; }
+  .sig { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 2px 0; }
+  .sig .n { color: var(--ink-soft); min-width: 96px; }
+  .sig .track { flex: 1; height: 5px; background: #eef0f3; border-radius: 3px; overflow: hidden; max-width: 120px; }
+  .sig .fill { height: 100%; background: var(--primary); }
+  .sig .fill.weak { background: var(--escalate); }
+  .sig .fill.mid { background: var(--review); }
+  .sig .w { font-family: var(--mono); font-size: 11px; color: var(--slate-soft); min-width: 58px; text-align: right; }
+  .sig.model .n { font-style: italic; }
+  .why { font-size: 12.5px; color: var(--escalate); margin: 8px 0 0; padding-left: 16px; }
+  .why li { margin-bottom: 2px; }
+  .why li b { font-weight: 600; }
+
   .checklist { margin-top: 34px; border-top: 2px solid var(--slate-deep); padding-top: 16px; }
   .cl-group { background: #fff; border: 1px solid var(--rule); border-radius: 3px; margin-bottom: 10px; }
   .cl-group > h3 {
@@ -517,6 +530,8 @@ const PRECEDENTS = [
     parameters: [{ name: "hedge_ratio_pct", value: "100" }, { name: "tolerance_band", value: "+/- 3" }, { name: "base_currency", value: "USD" }] }
 ];
 
+/* --- ROUTING:START (parsed by routing/audit.mjs — do not rename these markers) --- */
+
 const normName = n => String(n || "").toLowerCase().replace(/[^a-z]/g, "");
 const normVal = v => String(v == null ? "" : v).toLowerCase().replace(/\s+/g, " ").trim();
 
@@ -563,6 +578,90 @@ function findPrecedent(pred) {
   }
   return { ...best, rows };
 }
+
+/**
+ * Clause complexity tests. Regex over the source text the reviewer can read for themselves,
+ * so a reviewer can check any of these by eye. Tests marked hard escalate on their own —
+ * a clause that defers to a document nobody has cannot be coded no matter how confident
+ * anything is about it.
+ */
+const COMPLEXITY_TESTS = [
+  { id: "external_ref", weight: 0.35, hard: true, label: "defers to a document not in front of us",
+    re: /\b(appendix|schedule|exhibit|annex)\s+[A-Z0-9IVX]+/i },
+  { id: "carve_back", weight: 0.30, hard: true, label: "carved back by separate written agreement",
+    re: /except as otherwise agreed|unless the (client|parties) agree|subject to[^.]{0,40}written (consent|agreement)|as may be agreed/i },
+  { id: "double_negative", weight: 0.25, hard: false, label: "permission written as a negated prohibition",
+    re: /not (be )?(prohibited|precluded|prevented) from|nothing (herein )?shall (be construed to )?(preclude|prevent|prohibit)/i },
+  { id: "hedged", weight: 0.25, hard: false, label: "hedged obligation — may be a target, not a limit",
+    re: /with a view to|reasonable (efforts|endeavours|endeavors)|to the extent practicable|shall seek to/i },
+  { id: "conditional", weight: 0.15, hard: false, label: "conditional carve-out",
+    re: /provided that|provided, however/i },
+  { id: "multi_threshold", weight: 0.15, hard: false, label: "several thresholds in one clause",
+    test: t => (t.match(/\d[\d,.]*\s*(percent|%|basis points|bps|years|days)/gi) || []).length >= 3 }
+];
+
+const SIGNAL_WEIGHTS = { completeness: 0.30, precedent: 0.25, clarity: 0.30, model: 0.15 };
+
+/**
+ * Routing signal. Three of the four inputs are checkable without trusting the model at all:
+ * whether it filled the parameters the archetype expects, whether it dropped a parameter a
+ * prior account carried, and what the source text looks like. The model's own confidence is
+ * the smallest weight, because a model's self-report about its reliability is exactly the
+ * claim you should not take at face value.
+ */
+function assess(p) {
+  const signals = {};
+  const arch = ARCHETYPES.find(a => a[0] === p.archetype_id);
+  const expected = arch ? arch[2].split(",").map(x => normName(x)).filter(Boolean) : [];
+  const filled = (p.parameters || []).filter(x => String(x.value || "").trim()).map(x => normName(x.name));
+  signals.completeness = expected.length
+    ? Math.min(1, expected.filter(e => filled.includes(e)).length / expected.length)
+    : (filled.length ? 0.7 : 0);
+
+  const pr = findPrecedent(p);
+  const missingFromPrecedent = pr ? pr.rows.filter(r => r.kind === "missing").length : 0;
+  signals.precedent = pr
+    ? Math.max(0, 1 - missingFromPrecedent / Math.max(1, pr.parameters.length))
+    : null;
+
+  const text = ((p.clause && p.clause.text) || "") + " " + (p.parameters || []).map(x => x.value).join(" ");
+  const hits = COMPLEXITY_TESTS.filter(t => t.test ? t.test(text) : t.re.test(text));
+  signals.clarity = Math.max(0, 1 - hits.reduce((a, t) => a + t.weight, 0));
+  signals.model = typeof p.confidence === "number" ? p.confidence : 0;
+
+  // With no precedent to compare against, that weight moves to the signals we do have
+  // rather than being scored as a failure. Absence of precedent is not evidence of error.
+  const w = { ...SIGNAL_WEIGHTS };
+  if (signals.precedent === null) {
+    const share = w.precedent / 3;
+    w.completeness += share; w.clarity += share; w.model += share; w.precedent = 0;
+  }
+  const composite =
+    signals.completeness * w.completeness +
+    (signals.precedent === null ? 0 : signals.precedent * w.precedent) +
+    signals.clarity * w.clarity +
+    signals.model * w.model;
+
+  // Hard reasons mean nobody can code this correctly yet, so it goes to legal. Soft reasons
+  // mean something is worth a second pair of eyes — that is a review, not an escalation.
+  // Collapsing the two would flood the escalation queue and train people to ignore it.
+  const hard = [];
+  const soft = [];
+  if ((p.ambiguities || []).length) hard.push("model flagged an ambiguity");
+  for (const h of hits.filter(t => t.hard)) hard.push(h.label);
+  if (missingFromPrecedent) soft.push(missingFromPrecedent + " parameter(s) precedent carries and this does not");
+  if (expected.length && signals.completeness < 0.6) soft.push("archetype expects parameters the extraction did not fill");
+
+  let tier;
+  if (hard.length) tier = "escalate";
+  else if (composite < 0.55) tier = "escalate";
+  else if (soft.length || composite < 0.80) tier = "review";
+  else tier = "auto";
+
+  return { tier, composite, signals, hits, reasons: [...hard, ...soft], hard, soft, weights: w };
+}
+
+/* --- ROUTING:END --- */
 
 const OWNERS = {
   RESTRICTION: "Compliance — codes to the compliance engine",
@@ -662,9 +761,7 @@ Respond with a single JSON object and nothing else. No markdown fences, no pream
 
 function tierOf(p) {
   if (p.classification !== "RESTRICTION") return "other";
-  if ((p.ambiguities || []).length > 0 || p.confidence < 0.6) return "escalate";
-  if (p.confidence < 0.85) return "review";
-  return "auto";
+  return assess(p).tier;
 }
 
 const TIER_LABEL = {
@@ -807,9 +904,39 @@ function card(p, i) {
           ? (params ? "<table class='params'>" + params + "</table>" : "<p class='rationale'>No parameters extracted.</p>")
           : "<p class='rationale'>" + esc(p.summary || "") + "</p>") +
         (p.rationale ? "<p class='rationale'>" + esc(p.rationale) + "</p>" : "") +
-        exceptions + flags + precedentBlock(p) +
+        exceptions + flags + precedentBlock(p) + signalBlock(p) +
       "</div>" +
     "</div>" + foot + "</article>";
+}
+
+function signalBlock(p) {
+  if (p.classification !== "RESTRICTION") return "";
+  const a = assess(p);
+  const row = (name, val, weight, extra) => {
+    if (val === null) {
+      return "<div class='sig'><span class='n'>" + name + "</span><span class='nomatch'>no precedent to compare</span></div>";
+    }
+    const cls = val >= 0.8 ? "" : (val >= 0.55 ? "mid" : "weak");
+    return "<div class='sig " + (extra || "") + "'><span class='n'>" + name + "</span>" +
+      "<span class='track'><span class='fill " + cls + "' style='width:" + Math.round(val * 100) + "%'></span></span>" +
+      "<span class='w'>" + Math.round(val * 100) + "% · w" + weight.toFixed(2) + "</span></div>";
+  };
+  const s = a.signals, w = a.weights;
+  const lines = [
+    ...(a.hard || []).map(r => ["escalates", r]),
+    ...(a.soft || []).map(r => ["needs review", r])
+  ];
+  const why = lines.length
+    ? "<ul class='why'>" + lines.map(([k, r]) =>
+        "<li><b>" + k + "</b> — " + esc(r) + "</li>").join("") + "</ul>" : "";
+  return "<div class='signals'>" +
+    "<div class='who' style='font-size:12px;color:var(--slate-soft);margin-bottom:6px'>Routing signal — composite " +
+      Math.round(a.composite * 100) + "%</div>" +
+    row("Completeness", s.completeness, w.completeness) +
+    row("Precedent", s.precedent, w.precedent) +
+    row("Clause clarity", s.clarity, w.clarity) +
+    row("Model self-report", s.model, w.model, "model") +
+    why + "</div>";
 }
 
 function precedentBlock(p) {
